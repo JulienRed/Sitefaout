@@ -1,15 +1,17 @@
 # RUBIS Événements — site vitrine
 
-Site vitrine statique pour une agence événementielle. Thème noir & rouge rubis,
-logo rubis en SVG, cinq packs d'offres avec une animation propre à chacun,
-et un formulaire de devis envoyé par e-mail.
+Site vitrine statique pour une agence événementielle **corporate (B2B)** :
+séminaires, conventions, lancements produit, soirées de gala, team building.
+Thème noir & rouge rubis, registre sobre et institutionnel, formulaire de devis
+envoyé par e-mail.
 
 ## Contenu
 
 ```
-index.html            page unique (hero, expertises, packs, méthode, avis, devis, footer)
+index.html            page unique (hero, expertises, packs, méthode,
+                      engagements, références, FAQ, devis, footer)
 assets/css/styles.css thème noir & rouge, animations, responsive
-assets/js/main.js     animations au scroll, compteurs, menu, formulaire de devis
+assets/js/main.js     révélations au scroll, compteurs, menu, FAQ, devis
 assets/img/logo.svg   logo rubis (également utilisé comme favicon)
 ```
 
@@ -19,18 +21,26 @@ Aucune dépendance, aucun build : ouvrez `index.html` ou servez le dossier.
 npx http-server -p 8080 .
 ```
 
-## Les cinq packs et leurs animations
+## Parti pris graphique
+
+Registre corporate : typographie Inter uniquement, titres serrés, filets de 1 px,
+aplats sobres, rouge institutionnel (`#c8102e`) utilisé comme accent et non comme
+décor. Pas de halos néon ni d'effets clinquants — les animations servent à
+qualifier chaque offre, pas à attirer l'œil.
+
+## Les six packs et leurs animations
 
 | Pack | Animation |
 |------|-----------|
-| Corporate | faisceau de poursuite balayant une grille en perspective + barres de scène |
-| Mariage | pétales qui tombent et deux anneaux entrelacés qui pulsent |
-| Soirée & Clubbing | égaliseur audio 12 bandes + stroboscope |
-| Privé | explosion de confettis en boucle |
-| Sur-mesure | rubis à facettes scintillant avec une particule en orbite |
+| Séminaire | plan de salle en perspective balayé par une lumière de scène |
+| Convention | audience en perspective + arc de scène qui se dessine |
+| Lancement produit | ondes concentriques depuis l'objet mis en lumière |
+| Soirée de gala | colonnade, table ronde et balayage lumineux lent |
+| Team building | réseau de nœuds qui se connectent progressivement |
+| Sur-mesure | rubis à facettes avec point en orbite |
 
-Les cartes réagissent aussi au survol (relief 3D, halo rouge, puces qui pivotent).
-Tout est désactivé si le visiteur a activé « réduire les animations »
+Tout est réalisé en CSS/SVG, en cycles lents (6 à 9 s) et en monochrome rouge.
+Les animations sont désactivées si le visiteur a activé « réduire les animations »
 (`prefers-reduced-motion`).
 
 ## ⚙️ Configurer l'envoi du devis par mail
@@ -48,34 +58,39 @@ var CONFIG = {
 
 ### 1. Mode automatique (recommandé)
 
-1. Créez un formulaire gratuit sur [Formspree](https://formspree.io) ou
+1. Créez un formulaire sur [Formspree](https://formspree.io) ou
    [Web3Forms](https://web3forms.com) avec l'adresse de réception souhaitée.
 2. Collez l'URL d'envoi obtenue dans `FORM_ENDPOINT`
    (ex. `https://formspree.io/f/xxxxxxxx`).
 
-La demande part alors en arrière-plan et le visiteur voit un message de
-confirmation sans quitter la page. L'e-mail reçu contient chaque champ
-séparément, plus un récapitulatif prêt à lire.
+La demande part en arrière-plan et le visiteur voit une confirmation sans quitter
+la page. L'e-mail reçu contient chaque champ séparément, plus un récapitulatif
+prêt à lire.
 
 ### 2. Mode repli (par défaut)
 
 Tant que `FORM_ENDPOINT` est vide — ou si le service est injoignable — le
 formulaire ouvre le logiciel de messagerie du visiteur avec un message
 pré-rempli adressé à `CONTACT_EMAIL`. Le site est donc fonctionnel dès
-l'ouverture, sans aucune configuration.
+l'ouverture, sans configuration.
 
 ## Formulaire de devis
 
-- Champs : nom, e-mail, téléphone, société, pack, date, nombre d'invités, ville,
-  budget, description du projet, consentement RGPD.
-- Les boutons « Ce pack m'intéresse » font défiler jusqu'au formulaire et
-  présélectionnent le pack concerné.
-- Validation en français côté navigateur, message d'erreur sous chaque champ.
+- Champs B2B : nom, fonction, société, e-mail professionnel, téléphone, type
+  d'événement, date, nombre de participants, ville/région, budget prévisionnel,
+  description du projet, consentement RGPD.
+- Les boutons « Demander ce pack » font défiler jusqu'au formulaire et
+  présélectionnent le type d'événement.
+- Validation en français, message d'erreur sous chaque champ.
 - Champ pot-de-miel caché (`site_web`) contre les robots spammeurs.
 
 ## À personnaliser avant mise en ligne
 
-- Nom de l'agence, adresse, téléphone et e-mail (`index.html` + `main.js`).
-- Tarifs et contenu des packs.
-- Témoignages clients et chiffres clés du hero.
-- SIRET et mentions légales du pied de page.
+- **Logos clients** : les six noms du bandeau « Ils nous font confiance »
+  (AXENOR, VELTRIS GROUP…) sont fictifs — à remplacer par vos références réelles,
+  en texte ou en images.
+- **Témoignages** : les trois citations sont des exemples, à remplacer par de
+  vrais retours clients (avec leur accord).
+- **Chiffres clés** du hero, tarifs de départ des packs, contenu des FAQ.
+- Nom de l'agence, adresse, téléphone, e-mail (`index.html` + `main.js`).
+- SIRET, TVA, mentions légales et politique de confidentialité du pied de page.

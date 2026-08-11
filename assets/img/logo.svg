@@ -1,35 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Logo rubis">
   <defs>
     <linearGradient id="rubyTop" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ff6b7a"/>
-      <stop offset="55%" stop-color="#e11d2f"/>
-      <stop offset="100%" stop-color="#8f0d1c"/>
+      <stop offset="0%" stop-color="#e2233d"/>
+      <stop offset="100%" stop-color="#8a0b1f"/>
     </linearGradient>
     <linearGradient id="rubyBody" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#ff2d4a"/>
-      <stop offset="60%" stop-color="#c2101f"/>
-      <stop offset="100%" stop-color="#5e0611"/>
-    </linearGradient>
-    <linearGradient id="rubyShine" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity=".85"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#c8102e"/>
+      <stop offset="100%" stop-color="#6d0817"/>
     </linearGradient>
   </defs>
 
   <!-- table (facette supérieure) -->
   <polygon points="34,28 66,28 78,40 22,40" fill="url(#rubyTop)"/>
-  <!-- couronne gauche / droite -->
-  <polygon points="22,40 34,28 30,40" fill="#ff8494" opacity=".55"/>
-  <polygon points="78,40 66,28 70,40" fill="#7d0a17" opacity=".7"/>
   <!-- pavillon -->
   <polygon points="22,40 78,40 50,86" fill="url(#rubyBody)"/>
   <!-- facettes internes -->
-  <polygon points="22,40 50,40 50,86" fill="#ffffff" opacity=".08"/>
-  <polygon points="36,40 50,86 30,40" fill="#ffffff" opacity=".07"/>
-  <polygon points="64,40 50,86 70,40" fill="#000000" opacity=".18"/>
-  <!-- éclat -->
-  <polygon points="36,30 46,30 40,38 30,38" fill="url(#rubyShine)"/>
+  <polygon points="22,40 50,40 50,86" fill="#ffffff" opacity=".07"/>
+  <polygon points="64,40 50,86 70,40" fill="#000000" opacity=".16"/>
   <!-- contour -->
-  <path d="M34 28 H66 L78 40 L50 86 L22 40 Z" fill="none" stroke="#ff9aa6" stroke-opacity=".45" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M22 40 H78" fill="none" stroke="#ff9aa6" stroke-opacity=".35" stroke-width="1"/>
+  <path d="M34 28 H66 L78 40 L50 86 L22 40 Z" fill="none" stroke="#e8909c" stroke-opacity=".4" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M22 40 H78" fill="none" stroke="#e8909c" stroke-opacity=".3" stroke-width="1"/>
 </svg>

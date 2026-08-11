@@ -10,7 +10,7 @@
      Un site statique ne peut pas envoyer d'e-mail tout seul :
      il faut un service qui relaie le formulaire vers la boîte mail.
 
-     1) Créez un formulaire gratuit sur Formspree (https://formspree.io)
+     1) Créez un formulaire sur Formspree (https://formspree.io)
         ou Web3Forms (https://web3forms.com) avec l'adresse de réception.
      2) Collez l'URL d'envoi obtenue dans FORM_ENDPOINT ci-dessous.
 
@@ -35,7 +35,7 @@
 
   function onScroll() {
     var y = window.scrollY || document.documentElement.scrollTop;
-    header.classList.toggle('scrolled', y > 30);
+    header.classList.toggle('scrolled', y > 24);
 
     var h = document.documentElement.scrollHeight - window.innerHeight;
     progress.style.width = (h > 0 ? Math.min(y / h, 1) * 100 : 0) + '%';
@@ -85,7 +85,7 @@
           revealObs.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 
     revealables.forEach(function (el) { revealObs.observe(el); });
   }
@@ -99,7 +99,7 @@
 
     if (reduceMotion) { el.textContent = target + suffix; return; }
 
-    var duration = 1500;
+    var duration = 1400;
     var start    = null;
 
     function frame(ts) {
@@ -127,7 +127,7 @@
   /* =========================================================
      5. Lien de navigation actif selon la section visible
      ========================================================= */
-  var sections = ['expertises', 'packs', 'methode', 'avis', 'devis']
+  var sections = ['expertises', 'packs', 'methode', 'references', 'devis']
     .map(function (id) { return document.getElementById(id); })
     .filter(Boolean);
 
@@ -144,98 +144,18 @@
   }
 
   /* =========================================================
-     6. Effet de relief 3D sur les cartes de packs
+     6. FAQ : une seule question ouverte à la fois
      ========================================================= */
-  if (!reduceMotion && window.matchMedia('(hover: hover)').matches) {
-    $$('.pack').forEach(function (card) {
-      card.addEventListener('mousemove', function (e) {
-        var r  = card.getBoundingClientRect();
-        var px = (e.clientX - r.left) / r.width  - 0.5;
-        var py = (e.clientY - r.top)  / r.height - 0.5;
-        card.style.transform =
-          'translateY(-9px) perspective(900px) rotateX(' + (-py * 5).toFixed(2) +
-          'deg) rotateY(' + (px * 6).toFixed(2) + 'deg)';
-      });
-      card.addEventListener('mouseleave', function () { card.style.transform = ''; });
+  var faqItems = $$('.faq details');
+  faqItems.forEach(function (item) {
+    item.addEventListener('toggle', function () {
+      if (!item.open) return;
+      faqItems.forEach(function (other) { if (other !== item) other.open = false; });
     });
-  }
+  });
 
   /* =========================================================
-     7. Fond animé du hero : éclats de rubis
-     ========================================================= */
-  (function heroCanvas() {
-    var canvas = $('#heroCanvas');
-    if (!canvas || reduceMotion) { if (canvas) canvas.style.display = 'none'; return; }
-
-    var ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    var shards = [];
-    var dpr    = Math.min(window.devicePixelRatio || 1, 2);
-    var w = 0, h = 0;
-
-    function resize() {
-      var rect = canvas.getBoundingClientRect();
-      w = rect.width;
-      h = rect.height;
-      canvas.width  = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      var count = Math.max(18, Math.min(52, Math.round(w / 26)));
-      shards = [];
-      for (var i = 0; i < count; i++) {
-        shards.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          r: 1 + Math.random() * 2.6,
-          vx: (Math.random() - 0.5) * 0.22,
-          vy: -0.12 - Math.random() * 0.32,
-          a: 0.16 + Math.random() * 0.5,
-          rot: Math.random() * Math.PI,
-          vr: (Math.random() - 0.5) * 0.012
-        });
-      }
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-
-      for (var i = 0; i < shards.length; i++) {
-        var s = shards[i];
-        s.x += s.vx;
-        s.y += s.vy;
-        s.rot += s.vr;
-
-        if (s.y < -12) { s.y = h + 12; s.x = Math.random() * w; }
-        if (s.x < -12) s.x = w + 12;
-        if (s.x > w + 12) s.x = -12;
-
-        ctx.save();
-        ctx.translate(s.x, s.y);
-        ctx.rotate(s.rot);
-        ctx.beginPath();
-        ctx.moveTo(0, -s.r * 1.7);
-        ctx.lineTo(s.r, 0);
-        ctx.lineTo(0, s.r * 1.7);
-        ctx.lineTo(-s.r, 0);
-        ctx.closePath();
-        ctx.fillStyle = 'rgba(255,45,74,' + s.a + ')';
-        ctx.shadowColor = 'rgba(255,45,74,.85)';
-        ctx.shadowBlur  = 9;
-        ctx.fill();
-        ctx.restore();
-      }
-      requestAnimationFrame(draw);
-    }
-
-    resize();
-    window.addEventListener('resize', resize);
-    requestAnimationFrame(draw);
-  }());
-
-  /* =========================================================
-     8. Formulaire de devis
+     7. Formulaire de devis
      ========================================================= */
   var form      = $('#devisForm');
   var statusEl  = $('#formStatus');
@@ -266,10 +186,11 @@
   /* ---------------------- validation ---------------------- */
   var MESSAGES = {
     'f-nom':     'Merci d’indiquer votre nom.',
+    'f-societe': 'Merci d’indiquer le nom de votre société.',
     'f-email':   'Merci d’indiquer une adresse e-mail valide.',
-    'f-pack':    'Merci de choisir un pack.',
-    'f-message': 'Décrivez votre projet en quelques mots.',
-    'f-rgpd':    'Votre accord est nécessaire pour vous recontacter.'
+    'f-pack':    'Merci de sélectionner un type d’événement.',
+    'f-message': 'Décrivez votre projet en quelques lignes.',
+    'f-rgpd':    'Votre accord est nécessaire pour traiter la demande.'
   };
 
   function setError(input, message) {
@@ -293,7 +214,7 @@
     } else if (input.type === 'tel' && value && !/^[+0-9\s().-]{6,20}$/.test(value)) {
       msg = 'Numéro de téléphone invalide.';
     } else if (input.type === 'number' && value && (Number(value) < 1 || Number(value) > 100000)) {
-      msg = 'Indiquez un nombre d’invités réaliste.';
+      msg = 'Indiquez un nombre de participants réaliste.';
     }
 
     setError(input, msg);
@@ -321,10 +242,10 @@
   }
 
   var LABELS = {
-    nom: 'Nom', email: 'E-mail', telephone: 'Téléphone', societe: 'Société',
-    pack: 'Pack souhaité', date_evenement: 'Date envisagée', invites: 'Nombre d’invités',
-    ville: 'Ville / lieu', budget: 'Budget indicatif', message: 'Projet',
-    consentement: 'Consentement'
+    nom: 'Nom', fonction: 'Fonction', societe: 'Société', email: 'E-mail',
+    telephone: 'Téléphone', pack: 'Type d’événement', date_evenement: 'Date envisagée',
+    participants: 'Nombre de participants', ville: 'Ville / région',
+    budget: 'Budget prévisionnel', message: 'Projet', consentement: 'Consentement'
   };
 
   function toText(d) {
@@ -346,8 +267,9 @@
 
   /* ----------------- repli : client mail ------------------- */
   function sendViaMailto(data) {
-    var subject = 'Demande de devis — ' + (data.pack || 'événement') + ' — ' + data.nom;
-    var body    = 'Bonjour,\n\nVoici ma demande de devis :\n\n' + toText(data) +
+    var subject = 'Demande de devis — ' + (data.pack || 'événement') +
+                  ' — ' + (data.societe || data.nom);
+    var body    = 'Bonjour,\n\nVoici notre demande de devis :\n\n' + toText(data) +
                   '\n\nDemande envoyée depuis le site Rubis Événements.';
     window.location.href = 'mailto:' + CONFIG.CONTACT_EMAIL +
       '?subject=' + encodeURIComponent(subject) +
@@ -390,7 +312,7 @@
     loading(true);
 
     var payload = {
-      _subject: 'Demande de devis — ' + data.pack + ' — ' + data.nom,
+      _subject: 'Demande de devis — ' + data.pack + ' — ' + (data.societe || data.nom),
       recapitulatif: toText(data)
     };
     Object.keys(data).forEach(function (k) { payload[k] = data[k]; });
@@ -405,8 +327,8 @@
         form.reset();
         $$('.field', form).forEach(function (f) { f.classList.remove('invalid'); });
         setStatus(
-          'Merci ' + data.nom.split(' ')[0] + ' ! Votre demande de devis est bien partie. ' +
-          'Nous revenons vers vous sous 24 h ouvrées.', 'ok'
+          'Merci, votre demande est bien enregistrée. Un chef de projet revient vers vous ' +
+          'sous 48 h ouvrées avec une proposition chiffrée.', 'ok'
         );
       })
       .catch(function () {
@@ -419,7 +341,7 @@
   });
 
   /* =========================================================
-     9. Année courante dans le pied de page
+     8. Année courante dans le pied de page
      ========================================================= */
   var year = $('#year');
   if (year) year.textContent = String(new Date().getFullYear());

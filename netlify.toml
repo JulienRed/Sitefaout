@@ -1,0 +1,30 @@
+# Déploiement Netlify — site statique + fonction d'envoi du devis.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# Le formulaire appelle /api/devis quelle que soit la plateforme.
+[[redirects]]
+  from = "/api/devis"
+  to = "/.netlify/functions/devis"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# La police est versionnée dans son nom de fichier : cache long.
+[[headers]]
+  for = "/assets/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

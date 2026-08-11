@@ -11,9 +11,7 @@
 <meta property="og:description" content="Séminaires, conventions, lancements produit, galas et team building. Un partenaire unique, de la conception à la régie. Devis sous 48 h.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/img/logo.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -521,70 +519,95 @@
     </div>
 
     <form class="devis-form reveal" data-delay="1" id="devisForm" novalidate>
-      <div class="field-row">
-        <div class="field">
-          <label for="f-nom">Nom et prénom <span aria-hidden="true">*</span></label>
-          <input type="text" id="f-nom" name="nom" autocomplete="name" required placeholder="Alex Martin">
-          <p class="err" data-for="f-nom"></p>
-        </div>
-        <div class="field">
-          <label for="f-fonction">Fonction</label>
-          <input type="text" id="f-fonction" name="fonction" autocomplete="organization-title" placeholder="Directrice communication">
-        </div>
+
+      <div class="form-progress">
+        <p class="form-progress-label" id="stepLabel">Étape 1 sur 2 · Vos coordonnées</p>
+        <div class="form-progress-bar"><span id="stepBar"></span></div>
       </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label for="f-societe">Société <span aria-hidden="true">*</span></label>
-          <input type="text" id="f-societe" name="societe" autocomplete="organization" required placeholder="Nom de votre entreprise">
-          <p class="err" data-for="f-societe"></p>
-        </div>
-        <div class="field">
-          <label for="f-email">E-mail professionnel <span aria-hidden="true">*</span></label>
-          <input type="email" id="f-email" name="email" autocomplete="email" required placeholder="alex.martin@societe.fr">
-          <p class="err" data-for="f-email"></p>
-        </div>
-      </div>
+      <!-- ---------- Étape 1 : coordonnées ---------- -->
+      <fieldset class="form-step" data-step="1">
+        <legend class="sr-only">Vos coordonnées</legend>
 
-      <div class="field-row">
+        <div class="field-row">
+          <div class="field">
+            <label for="f-nom">Nom et prénom <span aria-hidden="true">*</span></label>
+            <input type="text" id="f-nom" name="nom" autocomplete="name" required
+                   aria-describedby="err-f-nom" placeholder="Alex Martin">
+            <p class="err" id="err-f-nom" data-for="f-nom"></p>
+          </div>
+          <div class="field">
+            <label for="f-fonction">Fonction</label>
+            <input type="text" id="f-fonction" name="fonction" autocomplete="organization-title"
+                   placeholder="Directrice communication">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-societe">Société <span aria-hidden="true">*</span></label>
+            <input type="text" id="f-societe" name="societe" autocomplete="organization" required
+                   aria-describedby="err-f-societe" placeholder="Nom de votre entreprise">
+            <p class="err" id="err-f-societe" data-for="f-societe"></p>
+          </div>
+          <div class="field">
+            <label for="f-email">E-mail professionnel <span aria-hidden="true">*</span></label>
+            <input type="email" id="f-email" name="email" autocomplete="email" required
+                   aria-describedby="err-f-email" placeholder="alex.martin@societe.fr">
+            <p class="err" id="err-f-email" data-for="f-email"></p>
+          </div>
+        </div>
+
         <div class="field">
           <label for="f-tel">Téléphone</label>
-          <input type="tel" id="f-tel" name="telephone" autocomplete="tel" placeholder="01 23 45 67 89">
-          <p class="err" data-for="f-tel"></p>
+          <input type="tel" id="f-tel" name="telephone" autocomplete="tel"
+                 aria-describedby="err-f-tel" placeholder="01 23 45 67 89">
+          <p class="err" id="err-f-tel" data-for="f-tel"></p>
         </div>
-        <div class="field">
-          <label for="f-pack">Type d'événement <span aria-hidden="true">*</span></label>
-          <select id="f-pack" name="pack" required>
-            <option value="">— Sélectionnez —</option>
-            <option>Pack Séminaire</option>
-            <option>Pack Convention</option>
-            <option>Pack Lancement produit</option>
-            <option>Pack Soirée de gala</option>
-            <option>Pack Team building</option>
-            <option>Pack Sur-mesure</option>
-            <option>À définir ensemble</option>
-          </select>
-          <p class="err" data-for="f-pack"></p>
-        </div>
-      </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label for="f-date">Date envisagée</label>
-          <input type="date" id="f-date" name="date_evenement">
-        </div>
-        <div class="field">
-          <label for="f-invites">Nombre de participants</label>
-          <input type="number" id="f-invites" name="participants" min="1" max="100000" step="1" placeholder="150">
-          <p class="err" data-for="f-invites"></p>
-        </div>
-      </div>
+        <button type="button" class="btn btn-primary btn-block js-next">
+          Continuer vers votre projet
+        </button>
+      </fieldset>
 
-      <div class="field-row">
-        <div class="field">
-          <label for="f-ville">Ville / région</label>
-          <input type="text" id="f-ville" name="ville" placeholder="Paris, Lyon, à définir…">
+      <!-- ---------- Étape 2 : projet ---------- -->
+      <fieldset class="form-step" data-step="2" hidden>
+        <legend class="sr-only">Votre projet</legend>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-pack">Type d'événement <span aria-hidden="true">*</span></label>
+            <select id="f-pack" name="pack" required aria-describedby="err-f-pack">
+              <option value="">— Sélectionnez —</option>
+              <option>Pack Séminaire</option>
+              <option>Pack Convention</option>
+              <option>Pack Lancement produit</option>
+              <option>Pack Soirée de gala</option>
+              <option>Pack Team building</option>
+              <option>Pack Sur-mesure</option>
+              <option>À définir ensemble</option>
+            </select>
+            <p class="err" id="err-f-pack" data-for="f-pack"></p>
+          </div>
+          <div class="field">
+            <label for="f-date">Date envisagée</label>
+            <input type="date" id="f-date" name="date_evenement">
+          </div>
         </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-invites">Nombre de participants</label>
+            <input type="number" id="f-invites" name="participants" min="1" max="100000" step="1"
+                   aria-describedby="err-f-invites" placeholder="150">
+            <p class="err" id="err-f-invites" data-for="f-invites"></p>
+          </div>
+          <div class="field">
+            <label for="f-ville">Ville / région</label>
+            <input type="text" id="f-ville" name="ville" placeholder="Paris, Lyon, à définir…">
+          </div>
+        </div>
+
         <div class="field">
           <label for="f-budget">Budget prévisionnel</label>
           <select id="f-budget" name="budget">
@@ -596,30 +619,41 @@
             <option>Plus de 150 000 € HT</option>
           </select>
         </div>
-      </div>
 
-      <div class="field">
-        <label for="f-message">Votre projet <span aria-hidden="true">*</span></label>
-        <textarea id="f-message" name="message" rows="5" required placeholder="Objectif de l'événement, format souhaité, contraintes internes, prestations attendues…"></textarea>
-        <p class="err" data-for="f-message"></p>
-      </div>
+        <div class="field">
+          <label for="f-message">Votre projet <span aria-hidden="true">*</span></label>
+          <textarea id="f-message" name="message" rows="5" required aria-describedby="err-f-message"
+                    placeholder="Objectif de l'événement, format souhaité, contraintes internes, prestations attendues…"></textarea>
+          <p class="err" id="err-f-message" data-for="f-message"></p>
+        </div>
 
-      <div class="field field-check">
-        <input type="checkbox" id="f-rgpd" name="consentement" required>
-        <label for="f-rgpd">J'accepte que ces informations soient utilisées pour traiter ma demande et me recontacter. <span aria-hidden="true">*</span></label>
-        <p class="err" data-for="f-rgpd"></p>
-      </div>
+        <div class="field field-check">
+          <input type="checkbox" id="f-rgpd" name="consentement" required aria-describedby="err-f-rgpd">
+          <label for="f-rgpd">
+            J'accepte que ces informations soient utilisées pour traiter ma demande et me recontacter.
+            <span aria-hidden="true">*</span>
+            <a href="confidentialite.html" class="inline-link">Politique de confidentialité</a>
+          </label>
+          <p class="err" id="err-f-rgpd" data-for="f-rgpd"></p>
+        </div>
 
-      <!-- anti-spam : champ caché, doit rester vide -->
-      <div class="hp" aria-hidden="true">
-        <label for="f-site">Ne pas remplir</label>
-        <input type="text" id="f-site" name="site_web" tabindex="-1" autocomplete="off">
-      </div>
+        <!-- anti-robot Cloudflare Turnstile : ajouté par le script si une clé est configurée -->
+        <div class="turnstile-mount" id="turnstileMount" hidden></div>
 
-      <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
-        <span class="btn-label">Envoyer ma demande de devis</span>
-        <span class="btn-spinner" aria-hidden="true"></span>
-      </button>
+        <!-- anti-spam : champ caché, doit rester vide -->
+        <div class="hp" aria-hidden="true">
+          <label for="f-site">Ne pas remplir</label>
+          <input type="text" id="f-site" name="site_web" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn btn-ghost js-prev">Retour</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <span class="btn-label">Envoyer ma demande de devis</span>
+            <span class="btn-spinner" aria-hidden="true"></span>
+          </button>
+        </div>
+      </fieldset>
 
       <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
       <p class="form-note">Données utilisées uniquement pour traiter votre demande, jamais cédées à des tiers.</p>
@@ -654,13 +688,18 @@
       <a href="tel:+33100000000">+33 1 00 00 00 00</a>
       <span>12 rue des Lumières<br>75011 Paris</span>
     </div>
+    <div class="footer-col">
+      <p class="footer-title">Informations</p>
+      <a href="mentions-legales.html">Mentions légales</a>
+      <a href="confidentialite.html">Politique de confidentialité</a>
+    </div>
   </div>
   <div class="wrap footer-bottom">
     <p>© <span id="year">2026</span> Rubis Événements — Tous droits réservés.</p>
-    <p>SIRET 000 000 000 00000 · TVA FR00 000000000 · Mentions légales · Politique de confidentialité</p>
+    <p>SIRET 000 000 000 00000 · TVA FR00 000000000</p>
   </div>
 </footer>
 
-<script src="assets/js/main.js"></script>
+<script src="assets/js/main.js" defer></script>
 </body>
 </html>

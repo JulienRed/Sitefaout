@@ -3,6 +3,20 @@
    Thème noir & rouge, registre corporate
    ========================================================= */
 
+/* Inter, auto-hébergé : une seule requête, aucun appel à un tiers.
+   Fichier variable (300–700) sous licence SIL OFL — assets/fonts/LICENSE-Inter.txt */
+@font-face{
+  font-family:"Inter var";
+  src:url("../fonts/inter-latin-variable.woff2") format("woff2-variations"),
+      url("../fonts/inter-latin-variable.woff2") format("woff2");
+  font-weight:300 700;
+  font-style:normal;
+  font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,
+                U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,
+                U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
 :root{
   --noir:        #0b0c0e;
   --noir-2:      #0e1013;
@@ -11,15 +25,17 @@
   --bord:        #1d2128;
   --bord-clair:  #2a2f38;
 
-  --rouge:       #c8102e;
-  --rouge-clair: #e2233d;
+  --rouge:       #c8102e;   /* aplats et surfaces — jamais sous du texte fin */
+  --rouge-clair: #e2233d;   /* aplats et gros titres (seuil 3:1) */
+  --rouge-texte: #ef4a60;   /* rouge réservé au texte : 5,15:1 sur fond sombre */
   --rouge-sombre:#8a0b1f;
 
-  --texte:       #eef1f5;
-  --texte-doux:  #9aa3af;
-  --texte-faible:#6b7280;
+  --texte:       #eef1f5;   /* 16,4:1 */
+  --texte-doux:  #9aa3af;   /*  7,3:1 */
+  --texte-faible:#828a97;   /*  5,3:1 — anciennement #6b7280 (4,0:1, sous le seuil AA) */
+  --texte-tenu:  #6b7280;   /* éléments non textuels uniquement (filets, logos au repos) */
 
-  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --sans: "Inter var", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   --rayon:   6px;
   --rayon-s: 4px;
@@ -240,10 +256,10 @@ p{ margin:0 0 1rem; }
   justify-content:space-between;
 }
 .clients-list li{
-  font-size:.95rem; font-weight:600; letter-spacing:.12em; color:#4e535c;
+  font-size:.95rem; font-weight:600; letter-spacing:.12em; color:var(--texte-faible);
   transition:color .3s ease;
 }
-.clients-list li:hover{ color:var(--texte-doux); }
+.clients-list li:hover{ color:var(--texte); }
 
 /* =========================================================
    SECTIONS GÉNÉRIQUES
@@ -514,7 +530,7 @@ p{ margin:0 0 1rem; }
 .step:hover::before{ transform:scaleX(1); }
 .step-num{
   display:block; font-size:.78rem; font-weight:700; letter-spacing:.16em;
-  color:var(--rouge); margin-bottom:1rem;
+  color:var(--rouge-texte); margin-bottom:1rem;
 }
 .step p{ color:var(--texte-doux); font-size:.92rem; margin:0; }
 
@@ -565,7 +581,7 @@ p{ margin:0 0 1rem; }
   font-size:1.02rem; font-weight:500; color:var(--texte); transition:color .25s ease;
 }
 .faq summary::-webkit-details-marker{ display:none; }
-.faq summary:hover{ color:var(--rouge-clair); }
+.faq summary:hover{ color:var(--rouge-texte); }
 .faq summary::after{
   content:""; position:absolute; right:4px; top:50%; width:11px; height:11px; margin-top:-7px;
   border-right:1.5px solid var(--rouge); border-bottom:1.5px solid var(--rouge);
@@ -592,16 +608,51 @@ p{ margin:0 0 1rem; }
 
 .devis-contact{ margin-top:2.2rem; padding-top:1.6rem; border-top:1px solid var(--bord); color:var(--texte-doux); }
 .devis-contact p{ margin:0 0 .4rem; font-size:.94rem; }
-.devis-contact a:hover{ color:var(--rouge-clair); }
+.devis-contact a:hover{ color:var(--rouge-texte); }
 
 .devis-form{
   background:var(--surface); border:1px solid var(--bord); border-radius:var(--rayon);
   padding:2.2rem; display:grid; gap:1.1rem;
 }
+
+/* --- formulaire en deux étapes --- */
+[hidden]{ display:none !important; }
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+
+.form-progress{ display:grid; gap:.6rem; margin-bottom:.4rem; }
+.form-progress-label{
+  margin:0; font-size:.78rem; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--texte-faible);
+}
+.form-progress-bar{ height:2px; background:var(--bord); overflow:hidden; }
+.form-progress-bar span{
+  display:block; height:100%; width:50%; background:var(--rouge);
+  transition:width .45s cubic-bezier(.22,.61,.36,1);
+}
+
+.form-step{
+  border:0; padding:0; margin:0; min-width:0;
+  display:grid; gap:1.1rem;
+  animation:stepIn .35s cubic-bezier(.22,.61,.36,1);
+}
+@keyframes stepIn{ from{ opacity:0; transform:translateX(10px); } to{ opacity:1; transform:none; } }
+
+.step-actions{ display:flex; gap:.8rem; margin-top:.4rem; }
+.step-actions .btn-ghost{ flex:none; }
+.step-actions .btn-primary{ flex:1; }
+
+.turnstile-mount{ min-height:65px; }
+
+.inline-link{ color:var(--texte-doux); text-decoration:underline; text-underline-offset:2px; }
+.inline-link:hover{ color:var(--rouge-texte); }
 .field{ display:grid; gap:.4rem; align-content:start; }
 .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; }
 .field label{ font-size:.83rem; font-weight:500; color:var(--texte-doux); }
-.field label span{ color:var(--rouge-clair); }
+.field label span{ color:var(--rouge-texte); }
 
 .field input,
 .field select,
@@ -612,7 +663,7 @@ p{ margin:0 0 1rem; }
 }
 .field textarea{ resize:vertical; min-height:118px; }
 .field input::placeholder,
-.field textarea::placeholder{ color:#565b64; }
+.field textarea::placeholder{ color:#7a828f; }
 .field input:focus,
 .field select:focus,
 .field textarea:focus{
@@ -637,8 +688,12 @@ p{ margin:0 0 1rem; }
 .field.invalid select,
 .field.invalid textarea{ border-color:#e2233d; box-shadow:0 0 0 3px rgba(226,35,61,.12); }
 
-.err{ margin:0; font-size:.79rem; color:#f0808d; }
-.err:empty{ display:none; }
+/* L'emplacement du message d'erreur est réservé en permanence.
+   Sans cela, l'apparition ou la disparition d'une erreur au moment
+   du blur décale tout ce qui suit : le bouton se déplace entre le
+   mousedown et le mouseup, et le clic est purement et simplement
+   perdu. C'est ce qui obligeait à cliquer deux fois sur « Continuer ». */
+.err{ margin:0; min-height:1.15rem; font-size:.79rem; line-height:1.45; color:#f0808d; }
 
 .field-check{ grid-template-columns:auto 1fr; align-items:start; gap:.7rem; margin-top:.2rem; }
 .field-check input{ width:17px; height:17px; margin-top:.28rem; accent-color:var(--rouge); cursor:pointer; }
@@ -663,7 +718,7 @@ p{ margin:0 0 1rem; }
    FOOTER
    ========================================================= */
 .site-footer{ background:#08090b; border-top:1px solid var(--bord); padding:4rem 0 1.8rem; }
-.footer-inner{ display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:2.5rem; align-items:start; }
+.footer-inner{ display:grid; grid-template-columns:1.7fr 1fr 1fr 1fr; gap:2.5rem; align-items:start; }
 .footer-brand{ display:flex; gap:.9rem; align-items:flex-start; }
 .footer-brand strong{ letter-spacing:.2em; font-size:.9rem; }
 .footer-brand p{ margin:.5rem 0 0; color:var(--texte-faible); font-size:.87rem; max-width:38ch; }
@@ -672,13 +727,105 @@ p{ margin:0 0 1rem; }
   margin:0 0 .3rem; font-size:.72rem; text-transform:uppercase; letter-spacing:.16em;
   color:var(--texte-faible); font-weight:600;
 }
-.footer-col a:hover{ color:var(--rouge-clair); }
+.footer-col a:hover{ color:var(--rouge-texte); }
 .footer-bottom{
   margin-top:3rem; padding-top:1.5rem; border-top:1px solid var(--bord);
   display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
   font-size:.79rem; color:var(--texte-faible);
 }
 .footer-bottom p{ margin:0; }
+
+/* =========================================================
+   PAGES ANNEXES (merci, mentions légales, confidentialité)
+   ========================================================= */
+.page{ padding:9.5rem 0 5rem; }
+.page-narrow{ max-width:780px; }
+.page .lead{ color:var(--texte-doux); font-size:1.05rem; max-width:62ch; }
+.page h1{ margin-bottom:.8rem; }
+.page h2{
+  font-size:1.15rem; margin:2.6rem 0 .8rem; padding-top:1.6rem;
+  border-top:1px solid var(--bord);
+}
+
+.merci-mark{
+  display:grid; place-items:center; width:60px; height:60px; margin-bottom:1.8rem;
+  border:1px solid var(--rouge); border-radius:50%;
+}
+.merci-mark svg{
+  width:30px; height:30px; fill:none; stroke:var(--rouge-texte);
+  stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;
+  stroke-dasharray:34; stroke-dashoffset:34;
+  animation:drawCheck .7s .2s cubic-bezier(.22,.61,.36,1) forwards;
+}
+@keyframes drawCheck{ to{ stroke-dashoffset:0; } }
+
+.merci-steps{
+  list-style:none; margin:3rem 0; padding:0;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem;
+}
+.merci-steps li{
+  background:var(--surface); border:1px solid var(--bord); border-radius:var(--rayon);
+  padding:1.6rem 1.4rem;
+}
+.merci-steps h2{
+  font-size:1rem; margin:0 0 .5rem; padding:0; border:0;
+}
+.merci-steps p{ margin:0; color:var(--texte-doux); font-size:.9rem; }
+
+.merci-cta{ display:flex; gap:.9rem; flex-wrap:wrap; margin-bottom:2rem; }
+.merci-contact{ color:var(--texte-doux); font-size:.93rem; }
+.merci-contact a{ color:var(--texte); text-decoration:underline; text-underline-offset:2px; }
+.merci-contact a:hover{ color:var(--rouge-texte); }
+
+.legal p,
+.legal li{ color:var(--texte-doux); }
+.legal a{ color:var(--texte); text-decoration:underline; text-underline-offset:2px; }
+.legal a:hover{ color:var(--rouge-texte); }
+.legal .btn{ text-decoration:none; }
+
+.legal-todo{
+  padding:1rem 1.2rem; margin:2rem 0;
+  border:1px solid rgba(200,16,46,.4); border-left-width:3px; border-radius:var(--rayon-s);
+  background:rgba(200,16,46,.07); font-size:.92rem;
+}
+.legal-todo strong{ color:var(--texte); }
+
+.legal-list{ margin:0; display:grid; grid-template-columns:minmax(160px,auto) 1fr; gap:.55rem 1.5rem; }
+.legal-list dt{ font-size:.82rem; text-transform:uppercase; letter-spacing:.1em; color:var(--texte-faible); }
+.legal-list dd{ margin:0; color:var(--texte); font-size:.95rem; }
+
+.legal-bullets{ margin:0 0 1rem; padding:0; list-style:none; display:grid; gap:.55rem; }
+.legal-bullets li{ position:relative; padding-left:1.35rem; font-size:.95rem; }
+.legal-bullets li::before{
+  content:""; position:absolute; left:0; top:.68em; width:7px; height:1px; background:var(--rouge);
+}
+.legal-bullets strong{ color:var(--texte); }
+
+.legal-updated{
+  margin-top:2.5rem; padding-top:1.4rem; border-top:1px solid var(--bord);
+  font-size:.83rem; color:var(--texte-faible);
+}
+
+.site-footer .footer-bottom a{ text-decoration:none; }
+.site-footer .footer-bottom a:hover{ color:var(--rouge-texte); }
+
+@media (max-width:760px){
+  .page{ padding:7rem 0 3.5rem; }
+  .merci-steps{ grid-template-columns:1fr; }
+  .legal-list{ grid-template-columns:1fr; gap:.2rem 0; }
+  .legal-list dd{ margin-bottom:.8rem; }
+}
+
+/* =========================================================
+   SOBRIÉTÉ : animations en pause hors de l'écran
+   ---------------------------------------------------------
+   Les six vignettes de packs et le visuel du hero tournent en
+   boucle. Sans cela, le navigateur continue de les composer même
+   quand elles sont hors champ — CPU et batterie pour rien.
+   La classe est posée par le script (IntersectionObserver).
+   ========================================================= */
+.anim-paused,
+.anim-paused *{ animation-play-state:paused !important; }
 
 /* =========================================================
    RÉVÉLATION AU SCROLL
@@ -703,7 +850,7 @@ p{ margin:0 0 1rem; }
   .step:nth-child(odd){ padding-left:0; }
   .step:nth-child(2n){ border-right:none; }
   .devis-inner{ grid-template-columns:1fr; gap:2.4rem; }
-  .footer-inner{ grid-template-columns:1fr 1fr; }
+  .footer-inner{ grid-template-columns:1fr 1fr; gap:2rem 2.5rem; }
 }
 
 @media (max-width:860px){

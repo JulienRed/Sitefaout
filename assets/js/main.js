@@ -5,22 +5,31 @@
   'use strict';
 
   /* ---------------------------------------------------------
-     CONFIGURATION DE L'ENVOI DU DEVIS PAR MAIL
+     CONFIGURATION
      ---------------------------------------------------------
-     Un site statique ne peut pas envoyer d'e-mail tout seul :
-     il faut un service qui relaie le formulaire vers la boîte mail.
+     API_ENDPOINT
+       URL de la fonction qui envoie le devis par e-mail
+       (server/devis.js, déployé via netlify/functions ou api/).
+       Si elle est injoignable — site publié sans fonctions, panne
+       du service — le formulaire bascule automatiquement sur le
+       client mail du visiteur, pré-rempli vers CONTACT_EMAIL.
+       Mettre '' pour forcer le mode mailto:.
 
-     1) Créez un formulaire sur Formspree (https://formspree.io)
-        ou Web3Forms (https://web3forms.com) avec l'adresse de réception.
-     2) Collez l'URL d'envoi obtenue dans FORM_ENDPOINT ci-dessous.
+     TURNSTILE_SITE_KEY
+       Clé publique Cloudflare Turnstile. Laissée vide, aucune
+       ressource tierce n'est chargée et seul le pot de miel
+       protège le formulaire. La clé secrète correspondante se
+       renseigne côté serveur (TURNSTILE_SECRET).
 
-     Tant que FORM_ENDPOINT est vide, le formulaire bascule
-     automatiquement sur le client mail du visiteur (mailto:)
-     avec un message pré-rempli adressé à CONTACT_EMAIL.
+     SUCCESS_PAGE
+       Page de confirmation après un envoi réussi — c'est elle qui
+       rend la conversion mesurable. '' pour rester sur place.
      --------------------------------------------------------- */
   var CONFIG = {
-    FORM_ENDPOINT: '',                              // ex. 'https://formspree.io/f/xxxxxxxx'
-    CONTACT_EMAIL: 'contact@rubis-evenements.fr'    // boîte de réception des devis
+    API_ENDPOINT:      '/api/devis',
+    TURNSTILE_SITE_KEY: '',
+    SUCCESS_PAGE:      'merci.html',
+    CONTACT_EMAIL:     'contact@rubis-evenements.fr'
   };
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -33,15 +42,16 @@
   var header   = $('.site-header');
   var progress = $('#progress');
 
-  function onScroll() {
-    var y = window.scrollY || document.documentElement.scrollTop;
-    header.classList.toggle('scrolled', y > 24);
+  if (header && progress) {
+    window.addEventListener('scroll', function () {
+      var y = window.scrollY || document.documentElement.scrollTop;
+      header.classList.toggle('scrolled', y > 24);
 
-    var h = document.documentElement.scrollHeight - window.innerHeight;
-    progress.style.width = (h > 0 ? Math.min(y / h, 1) * 100 : 0) + '%';
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.width = (h > 0 ? Math.min(y / h, 1) * 100 : 0) + '%';
+    }, { passive: true });
+    window.dispatchEvent(new Event('scroll'));
   }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
 
   /* =========================================================
      2. Menu mobile
@@ -49,26 +59,28 @@
   var burger = $('#burger');
   var nav    = $('#nav');
 
-  burger.addEventListener('click', function () {
-    var open = nav.classList.toggle('open');
-    burger.setAttribute('aria-expanded', String(open));
-    burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
-  });
+  if (burger && nav) {
+    burger.addEventListener('click', function () {
+      var open = nav.classList.toggle('open');
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+    });
 
-  nav.addEventListener('click', function (e) {
-    if (e.target.closest('a')) {
-      nav.classList.remove('open');
-      burger.setAttribute('aria-expanded', 'false');
-    }
-  });
+    nav.addEventListener('click', function (e) {
+      if (e.target.closest('a')) {
+        nav.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+      }
+    });
 
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && nav.classList.contains('open')) {
-      nav.classList.remove('open');
-      burger.setAttribute('aria-expanded', 'false');
-      burger.focus();
-    }
-  });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+        burger.focus();
+      }
+    });
+  }
 
   /* =========================================================
      3. Révélation des éléments au scroll
@@ -144,7 +156,36 @@
   }
 
   /* =========================================================
-     6. FAQ : une seule question ouverte à la fois
+     6. Animations mises en pause hors de l'écran
+     ---------------------------------------------------------
+     Les vignettes de packs et le visuel du hero bouclent en
+     continu : inutile de les composer quand elles sont hors champ.
+     ========================================================= */
+  var looping = $$('.pack-anim, .gem-scene, .hero-halo');
+
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    var animObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        entry.target.classList.toggle('anim-paused', !entry.isIntersecting);
+      });
+    }, { rootMargin: '120px 0px' });
+
+    looping.forEach(function (el) {
+      el.classList.add('anim-paused');
+      animObs.observe(el);
+    });
+  }
+
+  /* Onglet en arrière-plan : on suspend tout. */
+  document.addEventListener('visibilitychange', function () {
+    var hidden = document.visibilityState === 'hidden';
+    looping.forEach(function (el) {
+      if (hidden) el.classList.add('anim-paused');
+    });
+  });
+
+  /* =========================================================
+     7. FAQ : une seule question ouverte à la fois
      ========================================================= */
   var faqItems = $$('.faq details');
   faqItems.forEach(function (item) {
@@ -155,12 +196,82 @@
   });
 
   /* =========================================================
-     7. Formulaire de devis
+     8. Année courante dans le pied de page
      ========================================================= */
-  var form      = $('#devisForm');
+  var year = $('#year');
+  if (year) year.textContent = String(new Date().getFullYear());
+
+  /* =========================================================
+     9. Formulaire de devis
+     ---------------------------------------------------------
+     Absent des pages annexes (merci, mentions, confidentialité) :
+     on s'arrête ici pour elles.
+     ========================================================= */
+  var form = $('#devisForm');
+  if (!form) return;
+
   var statusEl  = $('#formStatus');
   var submitBtn = $('#submitBtn');
   var packSel   = $('#f-pack');
+  var stepLabel = $('#stepLabel');
+  var stepBar   = $('#stepBar');
+  var steps     = $$('.form-step', form);
+
+  var STEP_TITLES = ['Vos coordonnées', 'Votre projet'];
+  var current = 0;
+
+  /* ------------------ navigation par étapes ---------------- */
+  function fieldsOfStep(index) {
+    return $$('input, select, textarea', steps[index]).filter(function (el) {
+      return el.name && el.name !== 'site_web';
+    });
+  }
+
+  function showStep(index, moveFocus) {
+    current = index;
+
+    steps.forEach(function (step, i) { step.hidden = i !== index; });
+
+    if (stepLabel) {
+      stepLabel.textContent = 'Étape ' + (index + 1) + ' sur ' + steps.length +
+                              ' · ' + STEP_TITLES[index];
+    }
+    if (stepBar) {
+      stepBar.style.width = ((index + 1) / steps.length * 100) + '%';
+    }
+
+    if (moveFocus) {
+      var first = fieldsOfStep(index)[0];
+      if (first) first.focus({ preventScroll: true });
+      form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+  }
+
+  $$('.js-next', form).forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var firstInvalid = null;
+      fieldsOfStep(current).forEach(function (input) {
+        if (!validateField(input) && !firstInvalid) firstInvalid = input;
+      });
+
+      if (firstInvalid) {
+        setStatus('Complétez les champs signalés avant de continuer.', 'ko');
+        firstInvalid.focus();
+        return;
+      }
+      setStatus('');
+      showStep(Math.min(current + 1, steps.length - 1), true);
+    });
+  });
+
+  $$('.js-prev', form).forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setStatus('');
+      showStep(Math.max(current - 1, 0), true);
+    });
+  });
+
+  showStep(0, false);
 
   /* -- pré-sélection du pack depuis les boutons des cartes -- */
   $$('.js-devis').forEach(function (btn) {
@@ -175,6 +286,7 @@
         void packSel.offsetWidth;          /* relance l’animation de mise en avant */
         packSel.classList.add('prefilled');
       }
+      showStep(0, false);
       document.getElementById('devis').scrollIntoView({
         behavior: reduceMotion ? 'auto' : 'smooth',
         block: 'start'
@@ -225,6 +337,9 @@
     return el.name && el.name !== 'site_web';
   });
 
+  var byName = {};
+  fields.forEach(function (el) { byName[el.name] = el; });
+
   fields.forEach(function (input) {
     input.addEventListener('blur', function () { validateField(input); });
     input.addEventListener('input', function () {
@@ -265,6 +380,41 @@
     $('.btn-label', submitBtn).textContent = on ? 'Envoi en cours…' : 'Envoyer ma demande de devis';
   }
 
+  /* ------------------ anti-robot Turnstile ----------------- */
+  var turnstileId = null;
+
+  (function loadTurnstile() {
+    if (!CONFIG.TURNSTILE_SITE_KEY) return;
+
+    var mount = $('#turnstileMount');
+    if (!mount) return;
+    mount.hidden = false;
+
+    window.onTurnstileReady = function () {
+      turnstileId = window.turnstile.render(mount, {
+        sitekey: CONFIG.TURNSTILE_SITE_KEY,
+        theme: 'dark',
+        language: 'fr'
+      });
+    };
+
+    var script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js' +
+                 '?render=explicit&onload=onTurnstileReady';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }());
+
+  function turnstileToken() {
+    if (turnstileId === null || !window.turnstile) return '';
+    return window.turnstile.getResponse(turnstileId) || '';
+  }
+
+  function resetTurnstile() {
+    if (turnstileId !== null && window.turnstile) window.turnstile.reset(turnstileId);
+  }
+
   /* ----------------- repli : client mail ------------------- */
   function sendViaMailto(data) {
     var subject = 'Demande de devis — ' + (data.pack || 'événement') +
@@ -280,6 +430,24 @@
       'il ne reste plus qu’à l’envoyer. Si rien ne s’est ouvert, écrivez-nous à ' +
       CONFIG.CONTACT_EMAIL + '.', 'ok'
     );
+  }
+
+  /* --------- erreurs renvoyées par le serveur (422) -------- */
+  function applyServerErrors(errors) {
+    var firstInvalid = null;
+    Object.keys(errors).forEach(function (name) {
+      var input = byName[name];
+      if (!input) return;
+      setError(input, errors[name]);
+      if (!firstInvalid) firstInvalid = input;
+    });
+
+    if (firstInvalid) {
+      var stepIndex = steps.indexOf(firstInvalid.closest('.form-step'));
+      if (stepIndex > -1 && stepIndex !== current) showStep(stepIndex, false);
+      firstInvalid.focus();
+    }
+    setStatus('Certains champs doivent être corrigés avant l’envoi.', 'ko');
   }
 
   /* ---------------------- soumission ----------------------- */
@@ -300,6 +468,8 @@
     });
 
     if (firstInvalid) {
+      var stepIndex = steps.indexOf(firstInvalid.closest('.form-step'));
+      if (stepIndex > -1 && stepIndex !== current) showStep(stepIndex, false);
       setStatus('Certains champs doivent être corrigés avant l’envoi.', 'ko');
       firstInvalid.focus();
       return;
@@ -307,28 +477,60 @@
 
     var data = collect();
 
-    if (!CONFIG.FORM_ENDPOINT) { sendViaMailto(data); return; }
+    if (!CONFIG.API_ENDPOINT) { sendViaMailto(data); return; }
+
+    if (CONFIG.TURNSTILE_SITE_KEY && !turnstileToken()) {
+      setStatus('Merci de valider la vérification anti-robot ci-dessus.', 'ko');
+      return;
+    }
 
     loading(true);
 
-    var payload = {
-      _subject: 'Demande de devis — ' + data.pack + ' — ' + (data.societe || data.nom),
-      recapitulatif: toText(data)
-    };
+    var payload = {};
     Object.keys(data).forEach(function (k) { payload[k] = data[k]; });
+    payload.turnstile_token = turnstileToken();
+    payload.recapitulatif   = toText(data);
 
-    fetch(CONFIG.FORM_ENDPOINT, {
+    fetch(CONFIG.API_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
     })
       .then(function (res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json()
+          .catch(function () { return {}; })
+          .then(function (json) { return { status: res.status, ok: res.ok, json: json }; });
+      })
+      .then(function (res) {
+        /* Champs refusés par le serveur : on les signale sans renvoyer. */
+        if (res.status === 422 && res.json.errors) {
+          applyServerErrors(res.json.errors);
+          resetTurnstile();
+          return;
+        }
+
+        /* Anti-robot ou débit : message explicite, pas de repli mail. */
+        if (res.status === 403 || res.status === 429) {
+          setStatus(res.json.error || 'Envoi refusé. Réessayez dans quelques minutes.', 'ko');
+          resetTurnstile();
+          return;
+        }
+
+        /* Toute autre erreur : on ne perd pas la demande, on bascule sur le mail. */
+        if (!res.ok || !res.json.ok) throw new Error('HTTP ' + res.status);
+
+        if (CONFIG.SUCCESS_PAGE) {
+          window.location.href = CONFIG.SUCCESS_PAGE;
+          return;
+        }
+
         form.reset();
         $$('.field', form).forEach(function (f) { f.classList.remove('invalid'); });
+        resetTurnstile();
+        showStep(0, false);
         setStatus(
-          'Merci, votre demande est bien enregistrée. Un chef de projet revient vers vous ' +
-          'sous 48 h ouvrées avec une proposition chiffrée.', 'ok'
+          'Merci, votre demande est bien enregistrée. Un accusé de réception vient de vous ' +
+          'être envoyé et un chef de projet revient vers vous sous 48 h ouvrées.', 'ok'
         );
       })
       .catch(function () {
@@ -339,11 +541,5 @@
       })
       .then(function () { loading(false); });
   });
-
-  /* =========================================================
-     8. Année courante dans le pied de page
-     ========================================================= */
-  var year = $('#year');
-  if (year) year.textContent = String(new Date().getFullYear());
 
 }());

@@ -1,0 +1,13 @@
+# Secrets : jamais dans le dépôt (voir .env.example)
+.env
+.env.*
+!.env.example
+
+# Dépendances et sorties de build des plateformes
+node_modules/
+.netlify/
+.vercel/
+
+# Divers
+.DS_Store
+*.log

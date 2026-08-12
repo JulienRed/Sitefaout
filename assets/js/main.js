@@ -185,7 +185,36 @@
   });
 
   /* =========================================================
-     7. FAQ : une seule question ouverte à la fois
+     7. Barre d'action mobile
+     ---------------------------------------------------------
+     Visible une fois le hero dépassé, masquée dès que le
+     formulaire de devis est lui-même à l'écran.
+     ========================================================= */
+  var ctaMobile = $('#ctaMobile');
+  var hero      = $('.hero');
+  var devis     = $('#devis');
+
+  if (ctaMobile && hero && devis && 'IntersectionObserver' in window) {
+    var heroVisible  = true;
+    var devisVisible = false;
+
+    var majCta = function () {
+      ctaMobile.classList.toggle('visible', !heroVisible && !devisVisible);
+    };
+
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { heroVisible = e.isIntersecting; });
+      majCta();
+    }, { threshold: 0 }).observe(hero);
+
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { devisVisible = e.isIntersecting; });
+      majCta();
+    }, { threshold: 0 }).observe(devis);
+  }
+
+  /* =========================================================
+     8. FAQ : une seule question ouverte à la fois
      ========================================================= */
   var faqItems = $$('.faq details');
   faqItems.forEach(function (item) {
@@ -196,7 +225,7 @@
   });
 
   /* =========================================================
-     8. Page de confirmation : mention de l'accusé de réception
+     9. Page de confirmation : mention de l'accusé de réception
      ---------------------------------------------------------
      L'accusé n'est envoyé que si la demande a été confirmée par
      Turnstile (voir server/devis.js). On ne l'annonce donc que
@@ -208,13 +237,13 @@
   }
 
   /* =========================================================
-     9. Année courante dans le pied de page
+     10. Année courante dans le pied de page
      ========================================================= */
   var year = $('#year');
   if (year) year.textContent = String(new Date().getFullYear());
 
   /* =========================================================
-     10. Formulaire de devis
+     11. Formulaire de devis
      ---------------------------------------------------------
      Absent des pages annexes (merci, mentions, confidentialité) :
      on s'arrête ici pour elles.

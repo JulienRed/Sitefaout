@@ -41,7 +41,7 @@
   --rayon-s: 4px;
   --wrap:    1200px;
 
-  --transition: .4s cubic-bezier(.22,.61,.36,1);
+  --transition: .3s cubic-bezier(.22,.61,.36,1);   /* survols : 150–300 ms */
 }
 
 *,*::before,*::after{ box-sizing:border-box; }
@@ -58,6 +58,7 @@ body{
   font-weight:400;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
+  touch-action:manipulation;   /* supprime le délai de 300 ms au tap */
 }
 
 img,svg{ max-width:100%; }
@@ -734,6 +735,61 @@ p{ margin:0 0 1rem; }
   font-size:.79rem; color:var(--texte-faible);
 }
 .footer-bottom p{ margin:0; }
+
+/* =========================================================
+   CIBLES TACTILES ET BARRE D'ACTION MOBILE
+   ---------------------------------------------------------
+   Sur écran tactile, toute cible cliquable fait au moins
+   44 × 44 px et les cibles voisines sont espacées d'au moins
+   8 px. Sur pointeur fin (souris), on garde les proportions
+   compactes du design.
+   ========================================================= */
+@media (pointer: coarse){
+  .btn-sm{ min-height:44px; padding-inline:1.25rem; }
+  .burger{ width:44px; height:44px; }
+  .brand{ min-height:44px; }
+  .faq summary{ padding-block:1.5rem; }
+  .devis-contact a,
+  .footer-col a,
+  .footer-bottom a{ display:inline-flex; align-items:center; min-height:44px; }
+  .field-check{ gap:.9rem; }
+  .field-check input{ width:22px; height:22px; margin-top:.15rem; }
+  .pack-foot{ gap:1rem 1.2rem; }
+}
+
+/* Barre d'appel à l'action, mobile uniquement.
+   Sur petit écran le bouton « Demander un devis » du header est
+   replié dans le menu : plus aucune action visible pendant la
+   lecture. Cette barre apparaît une fois le hero dépassé et
+   s'efface quand le formulaire lui-même est à l'écran. */
+.cta-mobile{
+  position:fixed; left:0; right:0; bottom:0; z-index:90;
+  display:none; gap:.6rem; align-items:center;
+  padding:.7rem 1.25rem calc(.7rem + env(safe-area-inset-bottom, 0px));
+  background:rgba(11,12,14,.97);
+  backdrop-filter:blur(12px);
+  border-top:1px solid var(--bord);
+  transform:translateY(115%);
+  transition:transform .3s cubic-bezier(.22,.61,.36,1);
+}
+.cta-mobile.visible{ transform:none; }
+.cta-mobile .btn{ flex:1; min-height:48px; }
+.cta-mobile .cta-tel{
+  display:grid; place-items:center; width:48px; height:48px; flex:none;
+  border:1px solid var(--bord-clair); border-radius:var(--rayon-s);
+  transition:border-color .25s ease;
+}
+.cta-mobile .cta-tel:hover,
+.cta-mobile .cta-tel:focus-visible{ border-color:var(--rouge); }
+.cta-mobile .cta-tel svg{
+  width:20px; height:20px; fill:none; stroke:var(--texte);
+  stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;
+}
+
+@media (max-width:860px){
+  .cta-mobile{ display:flex; }
+  .site-footer{ padding-bottom:6rem; }
+}
 
 /* =========================================================
    PAGES ANNEXES (merci, mentions légales, confidentialité)

@@ -139,7 +139,7 @@
   /* =========================================================
      5. Lien de navigation actif selon la section visible
      ========================================================= */
-  var sections = ['expertises', 'packs', 'methode', 'references', 'devis']
+  var sections = ['expertises', 'packs', 'realisations', 'methode', 'devis']
     .map(function (id) { return document.getElementById(id); })
     .filter(Boolean);
 

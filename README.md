@@ -19,6 +19,8 @@ assets/css/styles.css    thème, animations, responsive
 assets/js/main.js        étapes du formulaire, envoi, animations, FAQ
 assets/fonts/            Inter variable auto-hébergé (SIL OFL)
 assets/img/logo.svg      logo rubis, également favicon
+assets/img/realisations/ scènes illustratives des études de cas (SVG générés)
+tools/                   générateur des scènes de la section Réalisations
 
 server/devis.js          traitement du devis (validation, anti-robot, e-mails)
 netlify/functions/       adaptateur Netlify
@@ -153,6 +155,28 @@ Si la fonction est injoignable (site publié sans backend, panne du service), le
 formulaire ouvre la messagerie du visiteur avec la demande pré-remplie plutôt
 que de perdre le contact.
 
+## Section Réalisations
+
+Six études de cas au format contexte → dispositif → résultat chiffré.
+
+**Les visuels ne sont pas des photographies.** Ce sont des scènes géométriques
+abstraites générées en SVG, dans le vocabulaire graphique du site : salle en
+perspective, faisceaux, tables rondes, réseau de nœuds, carte de tournée. Elles
+illustrent un type d'événement sans jamais prétendre montrer une prestation
+réelle. Chacune pèse entre 3 et 11 Ko, se charge en différé et porte ses
+dimensions, donc aucun décalage de mise en page à l'affichage.
+
+Pour les régénérer après modification (couleurs, composition, ajout d'une scène) :
+
+```bash
+python3 tools/generer-visuels-realisations.py
+```
+
+> **Contenu d'exemple.** Les six missions et tous leurs chiffres sont fictifs :
+> ils servent de gabarit. Remplacez-les par vos missions réelles — et par vos
+> photos si vous en avez — avant toute mise en ligne. Un commentaire le rappelle
+> en tête de la section dans `index.html`.
+
 ## Accessibilité
 
 - Contrastes conformes WCAG AA sur les quatre pages, vérifiés sur le rendu réel.
@@ -198,6 +222,9 @@ Tout est en CSS/SVG, en cycles lents de 6 à 9 s, en monochrome rouge.
 2. **Logos clients** du bandeau « Ils nous font confiance » — les six noms
    actuels sont fictifs.
 3. **Témoignages** : les trois citations sont des exemples.
-4. Chiffres clés du hero, tarifs de départ des packs, contenu de la FAQ.
-5. Nom de l'agence, adresse, téléphone, e-mail (`index.html`, pages annexes et
+4. **Réalisations** : les six études de cas et leurs chiffres sont fictifs. Les
+   scènes SVG peuvent rester telles quelles, ou céder la place à vos photos
+   (prévoir AVIF/WebP, `loading="lazy"` et dimensions explicites).
+5. Chiffres clés du hero, tarifs de départ des packs, contenu de la FAQ.
+6. Nom de l'agence, adresse, téléphone, e-mail (`index.html`, pages annexes et
    `CONFIG.CONTACT_EMAIL` dans `assets/js/main.js`).

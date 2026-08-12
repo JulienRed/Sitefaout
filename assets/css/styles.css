@@ -41,7 +41,8 @@
   --rayon-s: 4px;
   --wrap:    1200px;
 
-  --transition: .3s cubic-bezier(.22,.61,.36,1);   /* survols : 150–300 ms */
+  --transition: .3s cubic-bezier(.16,1,.3,1);   /* survols : 150–300 ms, easing expo */
+  --ease:       cubic-bezier(.16,1,.3,1);
 }
 
 *,*::before,*::after{ box-sizing:border-box; }
@@ -892,6 +893,154 @@ p{ margin:0 0 1rem; }
 .reveal[data-delay="2"]{ transition-delay:.16s; }
 .reveal[data-delay="3"]{ transition-delay:.24s; }
 .reveal[data-delay="4"]{ transition-delay:.32s; }
+
+/* =========================================================
+   ENRICHISSEMENTS GRAPHIQUES
+   ---------------------------------------------------------
+   Ajouts de matière et de profondeur, calibrés sur les règles
+   du skill ui-ux-pro-max : grain à 3 %, halos de lumière à
+   8–12 %, survols de 150 à 300 ms en transform/opacity/filter
+   uniquement, easing expo cubic-bezier(.16,1,.3,1).
+   ========================================================= */
+
+/* --- 1. Grain : une texture de papier très fine sur toute la page.
+       Casse l'aplat numérique des grands fonds noirs. --- */
+.grain{
+  position:fixed; inset:0; z-index:60; pointer-events:none;
+  opacity:.035;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
+  background-size:180px 180px;
+}
+
+/* --- 2. Halos de lumière ambiants derrière les packs --- */
+.section-packs{ position:relative; overflow:hidden; }
+.blob{
+  position:absolute; border-radius:50%; pointer-events:none;
+  filter:blur(70px); opacity:.1;
+  background:radial-gradient(circle, var(--rouge-clair), transparent 68%);
+}
+.blob-1{ width:520px; height:520px; top:-8%;  left:-10%; animation:blobDrift 26s ease-in-out infinite; }
+.blob-2{ width:440px; height:440px; bottom:-6%; right:-8%; animation:blobDrift 32s ease-in-out -12s infinite reverse; }
+@keyframes blobDrift{
+  0%,100%{ transform:translate3d(0,0,0) scale(1); }
+  50%    { transform:translate3d(6%,-8%,0) scale(1.12); }
+}
+
+/* --- 3. Cartes : filet de lumière sur l'arête haute --- */
+.feature::after,
+.quote::after,
+.engagement::after,
+.pack::after{
+  content:""; position:absolute; inset:0 0 auto 0; height:1px; pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16) 22%,
+                             rgba(255,255,255,.16) 78%,transparent);
+  opacity:0; transition:opacity .25s ease;
+}
+.feature:hover::after,
+.quote:hover::after,
+.engagement:hover::after,
+.pack:hover::after{ opacity:1; }
+.feature,.quote,.engagement{ position:relative; }
+
+/* --- 4. Packs : halo qui suit le curseur, et vignette qui s'anime --- */
+.pack{ --mx:50%; --my:0%; }
+.pack::before{
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  border-radius:inherit;
+  background:radial-gradient(340px circle at var(--mx) var(--my),
+             rgba(226,35,61,.13), transparent 68%);
+  opacity:0; transition:opacity .3s ease;
+}
+.pack:hover::before{ opacity:1; }
+.pack-anim,.pack-body{ position:relative; z-index:1; }
+
+/* La vignette d'illustration se réveille au survol : la scène gagne
+   en lumière sans qu'aucune propriété de mise en page ne bouge. */
+.pack-anim{ transition:filter .25s ease; }
+.pack:hover .pack-anim{ filter:brightness(1.35) saturate(1.08); }
+
+/* --- 5. Bandeau clients : défilement continu --- */
+.clients-viewport{
+  flex:1; min-width:0; overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+}
+.clients-track{ display:flex; width:max-content; animation:clientsScroll 42s linear infinite; }
+.clients-track .clients-list{ flex:none; justify-content:flex-start; padding-right:2.4rem; }
+.clients-viewport:hover .clients-track,
+.clients-track:focus-within{ animation-play-state:paused; }
+@keyframes clientsScroll{ to{ transform:translateX(-50%); } }
+
+/* =========================================================
+   PACKS : SCÈNES ENRICHIES
+   ========================================================= */
+
+/* 1. Séminaire — deux faisceaux de poursuite au-dessus de la salle */
+.anim-seminaire::before,
+.anim-seminaire::after{
+  content:""; position:absolute; top:-10px; width:70px; height:150px;
+  background:linear-gradient(180deg,rgba(226,35,61,.28),transparent 72%);
+  clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);
+  filter:blur(3px); transform-origin:50% 0; pointer-events:none;
+}
+.anim-seminaire::before{ left:16%;  animation:beamSway 9s ease-in-out infinite; }
+.anim-seminaire::after { right:16%; animation:beamSway 9s ease-in-out -4.5s infinite reverse; }
+@keyframes beamSway{ 0%,100%{ transform:rotate(-13deg); } 50%{ transform:rotate(13deg); } }
+
+/* 2. Convention — écran de scène qui pulse derrière l'arc */
+.anim-convention::before{
+  content:""; position:absolute; left:50%; top:22px; width:132px; height:46px;
+  margin-left:-66px; border:1px solid rgba(255,255,255,.10);
+  background:linear-gradient(180deg,rgba(226,35,61,.16),transparent);
+  animation:screenPulse 6s ease-in-out infinite; pointer-events:none;
+}
+@keyframes screenPulse{ 0%,100%{ opacity:.4; } 50%{ opacity:.95; } }
+
+/* 3. Lancement — halo tournant sous l'objet */
+.anim-lancement::before{
+  content:""; position:absolute; left:50%; top:50%; width:132px; height:132px;
+  margin:-66px 0 0 -66px; border-radius:50%; pointer-events:none;
+  background:conic-gradient(from 0deg, transparent 0deg, rgba(226,35,61,.24) 60deg,
+             transparent 150deg, transparent 360deg);
+  animation:ringSpin 11s linear infinite;
+  -webkit-mask-image:radial-gradient(circle,transparent 38%,#000 42%);
+          mask-image:radial-gradient(circle,transparent 38%,#000 42%);
+}
+
+/* 4. Gala — lustre de points lumineux suspendus */
+.anim-gala::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:56px; pointer-events:none;
+  background-image:radial-gradient(circle,rgba(255,255,255,.55) 1.2px,transparent 1.6px);
+  background-size:26px 18px;
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent);
+          mask-image:linear-gradient(180deg,#000,transparent);
+  animation:chandelier 7s ease-in-out infinite;
+}
+@keyframes chandelier{ 0%,100%{ opacity:.35; } 50%{ opacity:.85; } }
+
+/* 5. Team building — impulsion qui parcourt le réseau */
+.anim-team::before{
+  content:""; position:absolute; left:50%; top:50%; width:8px; height:8px;
+  margin:-4px 0 0 -4px; border-radius:50%; background:#fff; pointer-events:none;
+  box-shadow:0 0 12px 3px rgba(226,35,61,.75);
+  animation:pulseTravel 7s cubic-bezier(.5,0,.5,1) infinite;
+}
+@keyframes pulseTravel{
+  0%   { transform:translate(-78px,22px);  opacity:0; }
+  12%  { opacity:1; }
+  35%  { transform:translate(-26px,-22px); }
+  60%  { transform:translate(26px,16px); }
+  85%  { transform:translate(78px,-26px); opacity:1; }
+  100% { transform:translate(78px,-26px); opacity:0; }
+}
+
+/* 6. Sur-mesure — seconde orbite en sens inverse */
+.anim-mesure::before{
+  content:""; position:absolute; left:50%; top:50%; width:92px; height:92px;
+  margin:-46px 0 0 -46px; border-radius:50%; pointer-events:none;
+  border:1px dashed rgba(226,35,61,.28);
+  animation:ringSpin 19s linear infinite reverse;
+}
 
 /* =========================================================
    RESPONSIVE

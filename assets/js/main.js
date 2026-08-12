@@ -185,7 +185,38 @@
   });
 
   /* =========================================================
-     7. Barre d'action mobile
+     7. Halo des cartes de packs suivant le curseur
+     ---------------------------------------------------------
+     Deux variables CSS mises à jour au survol : le dégradé est
+     peint par le compositeur, aucune propriété de mise en page
+     n'est touchée. Pointeur fin uniquement — sans souris, le
+     halo n'aurait aucun sens.
+     ========================================================= */
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
+    $$('.pack').forEach(function (card) {
+      card.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((e.clientX - r.left) / r.width  * 100) + '%');
+        card.style.setProperty('--my', ((e.clientY - r.top)  / r.height * 100) + '%');
+      });
+    });
+  }
+
+  /* =========================================================
+     8. Bandeau clients : piste dupliquée pour un défilement continu
+     ---------------------------------------------------------
+     La copie est masquée aux lecteurs d'écran : elle ne sert
+     qu'à ce que la boucle se referme sans saut visible.
+     ========================================================= */
+  var clientsTrack = $('#clientsTrack');
+  if (clientsTrack && !reduceMotion) {
+    var copie = clientsTrack.firstElementChild.cloneNode(true);
+    copie.setAttribute('aria-hidden', 'true');
+    clientsTrack.appendChild(copie);
+  }
+
+  /* =========================================================
+     9. Barre d'action mobile
      ---------------------------------------------------------
      Visible une fois le hero dépassé, masquée dès que le
      formulaire de devis est lui-même à l'écran.
@@ -214,7 +245,7 @@
   }
 
   /* =========================================================
-     8. FAQ : une seule question ouverte à la fois
+     10. FAQ : une seule question ouverte à la fois
      ========================================================= */
   var faqItems = $$('.faq details');
   faqItems.forEach(function (item) {
@@ -225,7 +256,7 @@
   });
 
   /* =========================================================
-     9. Page de confirmation : mention de l'accusé de réception
+     11. Page de confirmation : mention de l'accusé de réception
      ---------------------------------------------------------
      L'accusé n'est envoyé que si la demande a été confirmée par
      Turnstile (voir server/devis.js). On ne l'annonce donc que
@@ -237,13 +268,13 @@
   }
 
   /* =========================================================
-     10. Année courante dans le pied de page
+     12. Année courante dans le pied de page
      ========================================================= */
   var year = $('#year');
   if (year) year.textContent = String(new Date().getFullYear());
 
   /* =========================================================
-     11. Formulaire de devis
+     13. Formulaire de devis
      ---------------------------------------------------------
      Absent des pages annexes (merci, mentions, confidentialité) :
      on s'arrête ici pour elles.

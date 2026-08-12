@@ -1,0 +1,79 @@
+name: Qualité du site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Audit accessibilité, responsive et liens
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installer Playwright
+        run: npm install --no-save playwright@1.56.1 && npx playwright install --with-deps chromium
+
+      - name: Vérifier la syntaxe des scripts
+        run: |
+          for f in assets/js/main.js server/devis.js api/devis.js netlify/functions/devis.js; do
+            node --check "$f"
+          done
+
+      - name: Vérifier qu'aucun secret n'a été committé
+        run: |
+          if grep -rIn -E '(re_[A-Za-z0-9]{20,}|21st_sk_[a-f0-9]{40,}|0x4[A-Za-z0-9]{30,})' \
+               --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.claude . ; then
+            echo "::error::Une clé secrète semble présente dans le dépôt."
+            exit 1
+          fi
+          echo "Aucun secret détecté."
+
+      - name: Auditer le site
+        run: node tools/audit.mjs
+
+      - name: Vérifier que les pages générées sont à jour
+        run: |
+          python3 tools/generer-pages-packs.py
+          python3 tools/appliquer-meta.py
+          if ! git diff --quiet; then
+            echo "::error::Les pages générées diffèrent des sources. Relancez les générateurs et committez."
+            git --no-pager diff --stat
+            exit 1
+          fi
+          echo "Pages générées à jour."
+
+  lighthouse:
+    name: Budget de performance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Servir le site
+        run: npx --yes http-server -p 8080 -s . &
+
+      - name: Attendre le serveur
+        run: npx --yes wait-on http://127.0.0.1:8080 --timeout 30000
+
+      - name: Lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            http://127.0.0.1:8080/index.html
+            http://127.0.0.1:8080/packs/convention.html
+          budgetPath: ./.github/budget-lighthouse.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true

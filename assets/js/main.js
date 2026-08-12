@@ -24,13 +24,46 @@
      SUCCESS_PAGE
        Page de confirmation après un envoi réussi — c'est elle qui
        rend la conversion mesurable. '' pour rester sur place.
+
+     ANALYTICS_DOMAIN
+       Domaine déclaré dans Plausible, par exemple
+       'rubis-evenements.fr'. Renseigné, le script de mesure est
+       chargé et l'envoi d'un devis est compté comme objectif.
+       Plausible ne dépose aucun cookie : pas de bandeau de
+       consentement, et la politique de confidentialité reste
+       exacte. Vide, aucune mesure, aucune requête tierce.
+
+     RDV_URL
+       Lien de prise de rendez-vous (Cal.com, Calendly…). Renseigné,
+       un bouton apparaît à côté du formulaire. Vide, rien ne
+       s'affiche.
      --------------------------------------------------------- */
   var CONFIG = {
     API_ENDPOINT:      '/api/devis',
     TURNSTILE_SITE_KEY: '',
     SUCCESS_PAGE:      'merci.html',
-    CONTACT_EMAIL:     'contact@rubis-evenements.fr'
+    CONTACT_EMAIL:     'contact@rubis-evenements.fr',
+    ANALYTICS_DOMAIN:  '',
+    RDV_URL:           ''
   };
+
+  /* ---------------------------------------------------------
+     Mesure d'audience sans cookie (Plausible)
+     --------------------------------------------------------- */
+  if (CONFIG.ANALYTICS_DOMAIN) {
+    var mesure = document.createElement('script');
+    mesure.defer = true;
+    mesure.setAttribute('data-domain', CONFIG.ANALYTICS_DOMAIN);
+    mesure.src = 'https://plausible.io/js/script.outbound-links.js';
+    document.head.appendChild(mesure);
+    window.plausible = window.plausible || function () {
+      (window.plausible.q = window.plausible.q || []).push(arguments);
+    };
+  }
+
+  function objectif(nom, options) {
+    if (window.plausible) window.plausible(nom, options);
+  }
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $  = function (s, c) { return (c || document).querySelector(s); };
@@ -245,7 +278,20 @@
   }
 
   /* =========================================================
-     10. FAQ : une seule question ouverte à la fois
+     10. Bouton de prise de rendez-vous
+     ========================================================= */
+  var rdvBloc = $('#rdvBloc');
+  if (rdvBloc && CONFIG.RDV_URL) {
+    var rdvLien = $('#rdvLien');
+    rdvLien.href = CONFIG.RDV_URL;
+    rdvLien.target = '_blank';
+    rdvLien.rel = 'noopener';
+    rdvLien.addEventListener('click', function () { objectif('Prise de rendez-vous'); });
+    rdvBloc.hidden = false;
+  }
+
+  /* =========================================================
+     11. FAQ : une seule question ouverte à la fois
      ========================================================= */
   var faqItems = $$('.faq details');
   faqItems.forEach(function (item) {
@@ -256,7 +302,7 @@
   });
 
   /* =========================================================
-     11. Page de confirmation : mention de l'accusé de réception
+     12. Page de confirmation : mention de l'accusé de réception
      ---------------------------------------------------------
      L'accusé n'est envoyé que si la demande a été confirmée par
      Turnstile (voir server/devis.js). On ne l'annonce donc que
@@ -268,13 +314,13 @@
   }
 
   /* =========================================================
-     12. Année courante dans le pied de page
+     13. Année courante dans le pied de page
      ========================================================= */
   var year = $('#year');
   if (year) year.textContent = String(new Date().getFullYear());
 
   /* =========================================================
-     13. Formulaire de devis
+     14. Formulaire de devis
      ---------------------------------------------------------
      Absent des pages annexes (merci, mentions, confidentialité) :
      on s'arrête ici pour elles.
@@ -345,19 +391,39 @@
 
   showStep(0, false);
 
+  /* -- pré-sélection depuis l'URL : ?pack=convention --
+        Les pages dédiées renvoient vers le formulaire avec ce paramètre. -- */
+  var SLUGS = {
+    'seminaire': 'Pack Séminaire',
+    'convention': 'Pack Convention',
+    'lancement-produit': 'Pack Lancement produit',
+    'soiree-de-gala': 'Pack Soirée de gala',
+    'team-building': 'Pack Team building',
+    'sur-mesure': 'Pack Sur-mesure'
+  };
+
+  function selectionnerPack(nom) {
+    if (!packSel || !nom) return false;
+    var match = Array.prototype.find.call(packSel.options, function (o) {
+      return o.textContent.trim() === nom;
+    });
+    if (!match) return false;
+    packSel.value = match.value;
+    packSel.classList.remove('prefilled');
+    void packSel.offsetWidth;
+    packSel.classList.add('prefilled');
+    return true;
+  }
+
+  (function depuisURL() {
+    var slug = new URLSearchParams(window.location.search).get('pack');
+    if (slug && SLUGS[slug]) selectionnerPack(SLUGS[slug]);
+  }());
+
   /* -- pré-sélection du pack depuis les boutons des cartes -- */
   $$('.js-devis').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var pack = btn.getAttribute('data-pack');
-      if (packSel) {
-        var match = Array.prototype.find.call(packSel.options, function (o) {
-          return o.textContent.trim() === pack;
-        });
-        packSel.value = match ? match.value : '';
-        packSel.classList.remove('prefilled');
-        void packSel.offsetWidth;          /* relance l’animation de mise en avant */
-        packSel.classList.add('prefilled');
-      }
+      selectionnerPack(btn.getAttribute('data-pack'));
       showStep(0, false);
       document.getElementById('devis').scrollIntoView({
         behavior: reduceMotion ? 'auto' : 'smooth',
@@ -406,8 +472,54 @@
   }
 
   var fields = $$('input, select, textarea', form).filter(function (el) {
-    return el.name && el.name !== 'site_web';
+    return el.name && el.name !== 'site_web' && el.type !== 'file';
   });
+
+  /* ------------------ pièce jointe facultative -------------------
+     3 Mo : au-delà, le corps encodé en base64 dépasse la limite de
+     charge utile des fonctions serverless. */
+  var champFichier = $('#f-fichier');
+  var TAILLE_MAX = 3 * 1024 * 1024;
+  var EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'];
+
+  function validerFichier() {
+    if (!champFichier) return true;
+    var f = champFichier.files && champFichier.files[0];
+    if (!f) { setError(champFichier, ''); return true; }
+
+    var ext = (f.name.split('.').pop() || '').toLowerCase();
+    if (EXTENSIONS.indexOf(ext) === -1) {
+      setError(champFichier, 'Formats acceptés : PDF, Word, PowerPoint, Excel.');
+      return false;
+    }
+    if (f.size > TAILLE_MAX) {
+      setError(champFichier, 'Fichier trop lourd (' +
+        (f.size / 1048576).toFixed(1) + ' Mo). Maximum 3 Mo.');
+      return false;
+    }
+    setError(champFichier, '');
+    return true;
+  }
+
+  if (champFichier) champFichier.addEventListener('change', validerFichier);
+
+  function lireFichier() {
+    var f = champFichier && champFichier.files && champFichier.files[0];
+    if (!f) return Promise.resolve(null);
+    return new Promise(function (resoudre) {
+      var lecteur = new FileReader();
+      lecteur.onload = function () {
+        resoudre({
+          nom: f.name,
+          type: f.type || 'application/octet-stream',
+          taille: f.size,
+          contenu: String(lecteur.result).split(',')[1] || ''
+        });
+      };
+      lecteur.onerror = function () { resoudre(null); };
+      lecteur.readAsDataURL(f);
+    });
+  }
 
   var byName = {};
   fields.forEach(function (el) { byName[el.name] = el; });
@@ -538,6 +650,7 @@
     fields.forEach(function (input) {
       if (!validateField(input) && !firstInvalid) firstInvalid = input;
     });
+    if (!validerFichier() && !firstInvalid) firstInvalid = champFichier;
 
     if (firstInvalid) {
       var stepIndex = steps.indexOf(firstInvalid.closest('.form-step'));
@@ -558,15 +671,18 @@
 
     loading(true);
 
-    var payload = {};
-    Object.keys(data).forEach(function (k) { payload[k] = data[k]; });
-    payload.turnstile_token = turnstileToken();
-    payload.recapitulatif   = toText(data);
+    lireFichier().then(function (fichier) {
+      var payload = {};
+      Object.keys(data).forEach(function (k) { payload[k] = data[k]; });
+      payload.turnstile_token = turnstileToken();
+      payload.recapitulatif   = toText(data);
+      if (fichier) payload.fichier = fichier;
 
-    fetch(CONFIG.API_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(payload)
+      return fetch(CONFIG.API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
     })
       .then(function (res) {
         return res.json()
@@ -590,6 +706,8 @@
 
         /* Toute autre erreur : on ne perd pas la demande, on bascule sur le mail. */
         if (!res.ok || !res.json.ok) throw new Error('HTTP ' + res.status);
+
+        objectif('Devis envoyé', { props: { pack: data.pack } });
 
         if (CONFIG.SUCCESS_PAGE) {
           window.location.href = CONFIG.SUCCESS_PAGE +

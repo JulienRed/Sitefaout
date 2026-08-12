@@ -6,5 +6,13 @@
   "license": "UNLICENSED",
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "audit": "node tools/audit.mjs",
+    "generer": "python3 tools/generer-pages-packs.py && python3 tools/appliquer-meta.py",
+    "images": "node tools/generer-images.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
   }
 }

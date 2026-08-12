@@ -15,3 +15,6 @@ node_modules/
 # Cache Python généré par l'exécution des skills
 __pycache__/
 *.py[cod]
+
+# Playwright installé localement pour les outils
+node_modules/

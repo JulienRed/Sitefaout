@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /merci.html
+Disallow: /api/
+
+Sitemap: https://www.rubis-evenements.fr/sitemap.xml

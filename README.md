@@ -8,8 +8,11 @@ via une fonction serverless.
 ## Contenu
 
 ```
-index.html               page principale (hero, expertises, packs, méthode,
-                         engagements, références, FAQ, devis)
+index.html               page principale (hero, expertises, packs, réalisations,
+                         méthode, engagements, références, FAQ, devis)
+packs/*.html             six pages dédiées, une par pack (générées)
+404.html                 page d'erreur
+robots.txt, sitemap.xml  socle d'indexation (générés)
 merci.html               confirmation après envoi — c'est elle qui rend la
                          conversion mesurable
 mentions-legales.html    mentions légales (à compléter)
@@ -20,7 +23,8 @@ assets/js/main.js        étapes du formulaire, envoi, animations, FAQ
 assets/fonts/            Inter variable auto-hébergé (SIL OFL)
 assets/img/logo.svg      logo rubis, également favicon
 assets/img/realisations/ scènes illustratives des études de cas (SVG générés)
-tools/                   générateur des scènes de la section Réalisations
+tools/                   générateurs et audit automatisé
+.github/workflows/       contrôle qualité à chaque push et pull request
 
 server/devis.js          traitement du devis (validation, anti-robot, e-mails)
 netlify/functions/       adaptateur Netlify
@@ -46,7 +50,8 @@ mail du visiteur : le site reste utilisable tel quel.
 ### Netlify
 
 1. Connectez le dépôt — `netlify.toml` fait le reste (publication à la racine,
-   fonctions dans `netlify/functions`, redirection de `/api/devis`).
+   fonctions dans `netlify/functions`, redirection de `/api/devis`, en-têtes de
+   sécurité dont une CSP stricte sans `unsafe-inline`).
 2. Renseignez les variables d'environnement listées ci-dessous.
 
 ### Vercel
@@ -147,6 +152,13 @@ barre de progression et une validation par étape.
 7. redirige vers `merci.html`, qui n'annonce l'accusé que s'il est réellement
    parti.
 
+Le formulaire accepte une **pièce jointe facultative** (cahier des charges) :
+PDF, Word, PowerPoint ou Excel, 3 Mo maximum — au-delà, le corps encodé dépasse
+la limite de charge utile des fonctions serverless. Le serveur revérifie
+l'extension, la validité du base64 et la taille réelle, et réduit le nom au nom
+de base pour qu'il ne puisse traverser aucun répertoire. La pièce n'accompagne
+que l'e-mail interne : le prospect a déjà son fichier.
+
 Les valeurs sont échappées avant insertion dans le HTML des e-mails et les
 retours à la ligne sont retirés des en-têtes : ni injection de balise, ni
 injection d'en-tête SMTP.
@@ -177,12 +189,62 @@ python3 tools/generer-visuels-realisations.py
 > photos si vous en avez — avant toute mise en ligne. Un commentaire le rappelle
 > en tête de la section dans `index.html`.
 
+## Référencement
+
+- **Une page par pack** dans `packs/`, avec son contenu, sa FAQ et son balisage
+  `Service` + `BreadcrumbList` + `FAQPage`. Une page unique ne se positionne pas
+  sur « organisation séminaire entreprise Lyon » ; six pages, si.
+- **Balisage de l'accueil** : `ProfessionalService`, `WebSite`, `OfferCatalog` et
+  `FAQPage` — les questions deviennent éligibles à l'affichage enrichi Google.
+- **`sitemap.xml` et `robots.txt`** générés, `merci.html` et `/api/` exclus.
+- **Canonical, Open Graph et Twitter Card** sur toutes les pages.
+- **`og-cover.png` 1200 × 630** : sans image bitmap, chaque partage sur LinkedIn
+  produisait une carte vide — aucun réseau social n'affiche un SVG en aperçu.
+
+Le domaine est défini une seule fois, en tête de `tools/appliquer-meta.py` et de
+`tools/generer-pages-packs.py` (`SITE = "https://www.rubis-evenements.fr"`).
+Après modification :
+
+```bash
+python3 tools/generer-pages-packs.py   # pages, sitemap, robots
+python3 tools/appliquer-meta.py        # canonical, OG, icônes
+node tools/generer-images.mjs          # og-cover.png et favicons
+```
+
+## Contrôle qualité automatisé
+
+`node tools/audit.mjs` rejoue, sur les onze pages, les vérifications qui sinon se
+perdraient : contrastes WCAG AA sur le rendu réel, cibles tactiles de 44 px
+(avec l'exception « inline » de WCAG 2.5.8), absence de débordement horizontal en
+375, 768, 1024 et 1440 px, liens internes morts, images sans `alt` ni dimensions,
+erreurs JavaScript et validité du JSON-LD. Sortie non nulle au moindre écart.
+
+Le workflow `.github/workflows/qualite.yml` l'exécute à chaque push et pull
+request, avec en plus : vérification syntaxique des scripts, détection de clé
+secrète committée, contrôle que les pages générées sont à jour, et un budget
+Lighthouse (`.github/budget-lighthouse.json`) qui interdit notamment toute
+ressource tierce.
+
+## Mesure d'audience et prise de rendez-vous
+
+Deux réglages dans `CONFIG`, en tête de `assets/js/main.js`, vides par défaut :
+
+| Clé | Effet |
+|---|---|
+| `ANALYTICS_DOMAIN` | charge Plausible et compte l'objectif « Devis envoyé » avec le pack choisi |
+| `RDV_URL` | affiche un bouton « Réserver un créneau » à côté du formulaire |
+
+Plausible ne dépose **aucun cookie** : pas de bandeau de consentement, et la
+politique de confidentialité reste exacte telle qu'elle est écrite. Google
+Analytics imposerait l'un et la réécriture de l'autre.
+
 ## Accessibilité
 
 - Contrastes conformes WCAG AA sur les quatre pages, vérifiés sur le rendu réel.
   Le rouge est décliné en trois valeurs : `--rouge` pour les aplats,
   `--rouge-clair` pour les gros titres (seuil 3:1), `--rouge-texte` (#ef4a60,
   5,15:1) dès qu'il porte du texte courant.
+- Cibles tactiles de 44 × 44 px minimum sur écran tactile, vérifiées par l'audit.
 - Chaque champ est relié à son message d'erreur par `aria-describedby`, et
   l'emplacement du message est réservé en permanence : une erreur qui apparaît
   ou disparaît ne décale plus la mise en page — sans cela, un clic sur

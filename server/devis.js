@@ -66,6 +66,43 @@ function safeHeader(value) {
 
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+/* Pièce jointe : formats bureautiques uniquement, 3 Mo maximum.
+   Au-delà, le corps encodé dépasse la limite de charge utile des
+   plateformes serverless. */
+var EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'];
+var TAILLE_MAX = 3 * 1024 * 1024;
+
+/* Le nom arrive du navigateur : on ne garde que le nom de base, sans
+   chemin ni caractère exotique, pour qu'il ne puisse rien traverser. */
+function nomSur(nom) {
+  var base = String(nom).split(/[\\/]/).pop();
+  base = base.replace(/[^\w .()\u00C0-\u017F-]/g, '_').slice(-120);
+  return base || 'piece-jointe';
+}
+
+function validerFichier(f) {
+  if (!f || typeof f !== 'object') return { ok: true, fichier: null };
+
+  var nom = nomSur(f.nom || '');
+  var ext = (nom.split('.').pop() || '').toLowerCase();
+  if (EXTENSIONS.indexOf(ext) === -1) {
+    return { ok: false, message: 'Format de pièce jointe non accepté.' };
+  }
+
+  var contenu = typeof f.contenu === 'string' ? f.contenu.replace(/\s/g, '') : '';
+  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(contenu) || !contenu) {
+    return { ok: false, message: 'Pièce jointe illisible.' };
+  }
+
+  /* Taille réelle déduite du base64, sans décoder : 4 caractères = 3 octets. */
+  var octets = Math.floor(contenu.length * 3 / 4);
+  if (octets > TAILLE_MAX) {
+    return { ok: false, message: 'Pièce jointe trop lourde (3 Mo maximum).' };
+  }
+
+  return { ok: true, fichier: { filename: nom, content: contenu, octets: octets } };
+}
+
 /* Limiteur simple, par instance. En environnement serverless les
    instances sont recyclées : c'est un garde-fou, pas une protection
    complète — Turnstile reste la vraie barrière anti-robot. */
@@ -198,7 +235,13 @@ function textRecap(data) {
   }).join('\n');
 }
 
-function internalEmail(data, siteName) {
+function internalEmail(data, siteName, piece) {
+  var lignePiece = piece
+    ? '<p style="margin:18px 0 0;padding:10px 14px;border:1px solid #e5e7eb;' +
+      'font:400 13px/1.6 Arial,sans-serif;color:#111317;">' +
+      'Pièce jointe : <strong>' + escapeHtml(piece.filename) + '</strong> (' +
+      (piece.octets / 1024).toFixed(0) + ' Ko)</p>'
+    : '';
   return '<div style="background:#f5f6f8;padding:24px;">' +
     '<div style="max-width:640px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;">' +
       '<div style="background:#111317;padding:18px 24px;">' +
@@ -209,6 +252,7 @@ function internalEmail(data, siteName) {
       '</div>' +
       '<div style="padding:24px;">' +
         '<table style="width:100%;border-collapse:collapse;">' + rows(data) + '</table>' +
+        lignePiece +
         '<p style="margin:24px 0 0;font:400 12px/1.6 Arial,sans-serif;color:#6b7280;">' +
         'Répondez directement à ce message pour joindre le demandeur.</p>' +
       '</div>' +
@@ -293,6 +337,10 @@ async function handleDevis(body, context) {
 
   /* 4. Validation métier */
   var errors = validate(data);
+
+  var verifFichier = validerFichier(data.fichier);
+  if (!verifFichier.ok) errors.fichier = verifFichier.message;
+
   if (Object.keys(errors).length) {
     return { status: 422, body: { ok: false, errors: errors } };
   }
@@ -312,7 +360,10 @@ async function handleDevis(body, context) {
   var sujet = 'Demande de devis — ' + safeHeader(str(data.pack)) +
               ' — ' + safeHeader(str(data.societe));
 
-  /* 6. E-mail interne — bloquant : c'est lui qui porte la demande */
+  /* 6. E-mail interne — bloquant : c'est lui qui porte la demande.
+        La pièce jointe n'accompagne que ce message : le prospect a
+        déjà son propre fichier, inutile de le lui renvoyer. */
+  var piece = verifFichier.fichier;
   try {
     await sendEmail({
       from: from,
@@ -320,8 +371,12 @@ async function handleDevis(body, context) {
       bcc: process.env.DEVIS_BCC ? [process.env.DEVIS_BCC] : undefined,
       reply_to: safeHeader(str(data.email)),
       subject: sujet,
-      html: internalEmail(data, siteName),
-      text: 'Nouvelle demande de devis\n\n' + textRecap(data)
+      html: internalEmail(data, siteName, piece),
+      text: 'Nouvelle demande de devis\n\n' + textRecap(data) +
+            (piece ? '\n\nPièce jointe : ' + piece.filename : ''),
+      attachments: piece
+        ? [{ filename: piece.filename, content: piece.content }]
+        : undefined
     });
   } catch (err) {
     console.error('Envoi interne impossible :', err.message);

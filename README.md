@@ -26,6 +26,8 @@ api/devis.js             adaptateur Vercel
 netlify.toml             publication + en-têtes + redirection /api/devis
 vercel.json              en-têtes
 .env.example             modèle des variables d'environnement
+.mcp.json                serveur MCP 21st.dev (clé via variable d'env)
+.claude/skills/          bundle de skills design ui-ux-pro-max
 ```
 
 Aucune dépendance, aucun build. En local :
@@ -79,6 +81,48 @@ envoyé sans contrôle, il permettrait à n'importe qui d'adresser le message de
 son choix à la victime de son choix, depuis votre domaine vérifié. Les demandes
 vous parviennent toujours dans les deux cas — seule la réponse automatique est
 conditionnée.
+
+## Outils de développement
+
+### Skills de design (`.claude/skills/`)
+
+Le bundle [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
+est versionné dans le dépôt : il est donc actif pour toute session Claude Code
+ouverte sur ce projet, sans installation supplémentaire. Base de règles UI/UX
+interrogeable :
+
+```bash
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<requête>" --domain ux
+```
+
+Les règles tactiles et de conversion qu'il porte ont servi à l'audit du site
+(cibles 44 × 44 px, barre d'action mobile). Sa palette et ses polices par défaut
+ne sont volontairement pas suivies : l'identité noir et rouge rubis prime.
+
+### Serveur MCP 21st.dev (`.mcp.json`)
+
+Configuré au niveau du projet. **La clé n'est pas dans le dépôt** — le fichier
+référence la variable d'environnement `TWENTYFIRST_API_KEY`, que Claude Code
+substitue au démarrage :
+
+```bash
+export TWENTYFIRST_API_KEY="21st_sk_…"   # à mettre dans votre shell, pas ici
+```
+
+Sans cette variable, Claude Code signale `Missing environment variables:
+TWENTYFIRST_API_KEY` et ignore simplement le serveur. Vérification :
+
+```bash
+claude mcp list
+```
+
+Alternative officielle, qui installe le serveur MCP et les skills 21st ensemble,
+à taper dans Claude Code :
+
+```
+/plugin marketplace add 21st-dev/claude-code-plugin
+/plugin install 21st@21st
+```
 
 ## Chaîne d'envoi du devis
 

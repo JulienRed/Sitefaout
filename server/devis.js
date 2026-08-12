@@ -143,10 +143,18 @@ function validate(data) {
    Turnstile (Cloudflare)
    --------------------------------------------------------- */
 
+/* Renvoie l'un de :
+     'humain'     — jeton vérifié par Cloudflare
+     'refuse'     — jeton absent ou invalide : la demande est rejetée
+     'inconnu'    — Turnstile non configuré, ou service injoignable
+
+   'inconnu' laisse passer la demande — on ne perd pas un prospect parce que
+   Cloudflare est en panne — mais l'accusé de réception, lui, ne partira pas :
+   voir la note sur l'usage en relais dans handleDevis(). */
 async function verifyTurnstile(token, ip) {
   var secret = process.env.TURNSTILE_SECRET;
-  if (!secret) return true;              /* non configuré : on ne bloque pas */
-  if (!token) return false;
+  if (!secret) return 'inconnu';
+  if (!token) return 'refuse';
 
   var params = new URLSearchParams();
   params.set('secret', secret);
@@ -160,11 +168,10 @@ async function verifyTurnstile(token, ip) {
       body: params.toString()
     });
     var json = await res.json();
-    return json.success === true;
+    return json.success === true ? 'humain' : 'refuse';
   } catch (err) {
-    /* Turnstile injoignable : on laisse passer plutôt que de perdre un devis. */
     console.error('Turnstile injoignable :', err.message);
-    return true;
+    return 'inconnu';
   }
 }
 
@@ -276,8 +283,8 @@ async function handleDevis(body, context) {
   }
 
   /* 3. Anti-robot Cloudflare Turnstile */
-  var human = await verifyTurnstile(str(data.turnstile_token), ip);
-  if (!human) {
+  var verification = await verifyTurnstile(str(data.turnstile_token), ip);
+  if (verification === 'refuse') {
     return {
       status: 403,
       body: { ok: false, error: 'Vérification anti-robot échouée. Rechargez la page et réessayez.' }
@@ -324,8 +331,27 @@ async function handleDevis(body, context) {
     };
   }
 
-  /* 7. Accusé de réception au prospect — non bloquant :
-        la demande est déjà arrivée, on ne fait pas échouer pour autant. */
+  /* 7. Accusé de réception au prospect.
+
+        Attention : cet e-mail part vers une adresse fournie par l'appelant et
+        reprend son texte libre. Envoyé sans condition, il transforme le
+        formulaire en relais : n'importe qui peut faire parvenir le message de
+        son choix à la victime de son choix, expédié depuis notre domaine
+        vérifié — donc avec notre réputation et notre crédibilité.
+
+        On ne l'envoie donc que si Turnstile a confirmé un humain. Sans
+        Turnstile configuré, ou s'il est injoignable, la demande arrive bien
+        dans la boîte interne mais aucun message ne part vers l'extérieur.
+
+        Non bloquant par ailleurs : la demande est déjà arrivée. */
+  if (verification !== 'humain') {
+    if (!process.env.TURNSTILE_SECRET) {
+      console.warn('Accusé de réception non envoyé : TURNSTILE_SECRET absent. ' +
+                   'Configurez Turnstile pour activer la réponse automatique.');
+    }
+    return { status: 200, body: { ok: true, accuse: false } };
+  }
+
   try {
     await sendEmail({
       from: from,

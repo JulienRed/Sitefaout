@@ -196,13 +196,25 @@
   });
 
   /* =========================================================
-     8. Année courante dans le pied de page
+     8. Page de confirmation : mention de l'accusé de réception
+     ---------------------------------------------------------
+     L'accusé n'est envoyé que si la demande a été confirmée par
+     Turnstile (voir server/devis.js). On ne l'annonce donc que
+     si le serveur a dit qu'il était bien parti.
+     ========================================================= */
+  var arNote = $('#arNote');
+  if (arNote && /(?:^|[?&])ar=1(?:&|$)/.test(window.location.search)) {
+    arNote.hidden = false;
+  }
+
+  /* =========================================================
+     9. Année courante dans le pied de page
      ========================================================= */
   var year = $('#year');
   if (year) year.textContent = String(new Date().getFullYear());
 
   /* =========================================================
-     9. Formulaire de devis
+     10. Formulaire de devis
      ---------------------------------------------------------
      Absent des pages annexes (merci, mentions, confidentialité) :
      on s'arrête ici pour elles.
@@ -520,7 +532,8 @@
         if (!res.ok || !res.json.ok) throw new Error('HTTP ' + res.status);
 
         if (CONFIG.SUCCESS_PAGE) {
-          window.location.href = CONFIG.SUCCESS_PAGE;
+          window.location.href = CONFIG.SUCCESS_PAGE +
+            (res.json.accuse === false ? '' : '?ar=1');
           return;
         }
 
@@ -529,8 +542,9 @@
         resetTurnstile();
         showStep(0, false);
         setStatus(
-          'Merci, votre demande est bien enregistrée. Un accusé de réception vient de vous ' +
-          'être envoyé et un chef de projet revient vers vous sous 48 h ouvrées.', 'ok'
+          'Merci, votre demande est bien enregistrée.' +
+          (res.json.accuse === false ? '' : ' Un accusé de réception vient de vous être envoyé.') +
+          ' Un chef de projet revient vers vous sous 48 h ouvrées.', 'ok'
         );
       })
       .catch(function () {

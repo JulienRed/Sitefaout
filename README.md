@@ -62,7 +62,7 @@ Voir `.env.example`. À définir dans l'interface de l'hébergeur, jamais dans l
 | `DEVIS_TO` | boîte qui reçoit les demandes — obligatoire |
 | `DEVIS_BCC` | copie cachée interne (facultatif) |
 | `SITE_NAME` | nom affiché dans les e-mails (facultatif) |
-| `TURNSTILE_SECRET` | clé secrète Cloudflare Turnstile (facultatif) |
+| `TURNSTILE_SECRET` | clé secrète Cloudflare Turnstile — nécessaire à l'accusé de réception |
 
 ### Anti-robot Turnstile (recommandé)
 
@@ -72,6 +72,13 @@ Voir `.env.example`. À définir dans l'interface de l'hébergeur, jamais dans l
 
 Tant que la clé publique est vide, aucune ressource tierce n'est chargée et seul
 le pot de miel protège le formulaire.
+
+**Sans Turnstile, l'accusé de réception au prospect n'est pas envoyé.** Cet
+e-mail part vers une adresse fournie par l'appelant et reprend son texte libre :
+envoyé sans contrôle, il permettrait à n'importe qui d'adresser le message de
+son choix à la victime de son choix, depuis votre domaine vérifié. Les demandes
+vous parviennent toujours dans les deux cas — seule la réponse automatique est
+conditionnée.
 
 ## Chaîne d'envoi du devis
 
@@ -88,8 +95,11 @@ barre de progression et une validation par étape.
    champ concerné, en revenant à la bonne étape ;
 5. envoie la demande à l'équipe (`reply_to` = le prospect, pour répondre d'un
    clic) ;
-6. envoie un **accusé de réception au prospect**, avec le récapitulatif ;
-7. redirige vers `merci.html`.
+6. envoie un **accusé de réception au prospect** avec le récapitulatif —
+   uniquement si Turnstile a confirmé un humain, sans quoi le formulaire
+   servirait de relais à spam depuis votre domaine ;
+7. redirige vers `merci.html`, qui n'annonce l'accusé que s'il est réellement
+   parti.
 
 Les valeurs sont échappées avant insertion dans le HTML des e-mails et les
 retours à la ligne sont retirés des en-têtes : ni injection de balise, ni

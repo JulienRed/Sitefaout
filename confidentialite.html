@@ -75,6 +75,8 @@
       <li>éléments du projet : type d'événement, date envisagée, nombre de participants, ville,
           budget prévisionnel, description libre ;</li>
       <li>votre consentement à être recontacté.</li>
+      <li>pour un achat de billets : nom, adresse de facturation, e-mail et téléphone,
+          collectés par Stripe pendant le paiement et transmis pour l'émission des billets.</li>
     </ul>
     <p>
       Aucun profilage, aucune décision automatisée, aucune donnée sensible n'est traitée. Le champ
@@ -97,6 +99,9 @@
       <li><strong>Resend</strong> — acheminement des e-mails de demande et d'accusé de réception ;</li>
       <li><strong>Cloudflare (Turnstile)</strong> — vérification anti-robot du formulaire, le cas
           échéant, sans cookie de suivi publicitaire.</li>
+      <li><strong>Stripe</strong> — traitement des paiements de la billetterie. Les données
+          de carte bancaire sont saisies directement chez Stripe et ne transitent jamais
+          par ce site.</li>
     </ul>
     <p>
       Aucune donnée n'est vendue, louée ni cédée à des fins commerciales. Les transferts hors Union

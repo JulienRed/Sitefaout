@@ -49,8 +49,10 @@ const serveur = createServer(async (req, res) => {
 await new Promise((r) => serveur.listen(PORT, r));
 
 /* ---------- pages à contrôler ---------- */
-const pages = ['/index.html', '/merci.html', '/mentions-legales.html',
-               '/confidentialite.html', '/404.html'];
+const pages = (await readdir(RACINE))
+  .filter((f) => f.endsWith('.html'))
+  .sort()
+  .map((f) => '/' + f);
 if (existsSync(join(RACINE, 'packs'))) {
   for (const f of await readdir(join(RACINE, 'packs'))) {
     if (f.endsWith('.html')) pages.push('/packs/' + f);

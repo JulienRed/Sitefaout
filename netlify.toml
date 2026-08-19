@@ -10,6 +10,26 @@
   to = "/.netlify/functions/devis"
   status = 200
 
+[[redirects]]
+  from = "/api/billetterie"
+  to = "/.netlify/functions/billetterie"
+  status = 200
+
+[[redirects]]
+  from = "/api/paiement"
+  to = "/.netlify/functions/paiement"
+  status = 200
+
+[[redirects]]
+  from = "/api/stripe-webhook"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+
+[[redirects]]
+  from = "/api/verifier-billet"
+  to = "/.netlify/functions/verifier-billet"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]

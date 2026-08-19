@@ -391,6 +391,27 @@
 
   showStep(0, false);
 
+  /* -- « Être prévenu du lancement » sur les offres à venir --
+        Ces packs ne sont pas encore commandables : on renvoie vers le
+        formulaire avec un message pré-rempli, sans inventer une option
+        de devis qui n'existe pas encore. -- */
+  $$('.js-prevenir').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var offre = btn.getAttribute('data-offre') || '';
+      var message = $('#f-message');
+      if (message && !message.value.trim()) {
+        message.value = 'Je souhaite être prévenu du lancement du ' + offre + '.';
+      }
+      selectionnerPack('À définir ensemble');
+      showStep(0, false);
+      document.getElementById('devis').scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth', block: 'start'
+      });
+      window.setTimeout(function () { $('#f-nom').focus({ preventScroll: true }); }, 650);
+      objectif('Intérêt offre à venir', { props: { offre: offre } });
+    });
+  });
+
   /* -- pré-sélection depuis l'URL : ?pack=convention --
         Les pages dédiées renvoient vers le formulaire avec ce paramètre. -- */
   var SLUGS = {

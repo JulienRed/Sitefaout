@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contrôle des billets — Rubis Événements</title>
+<meta name="description" content="Vérification de l'authenticité d'un billet à l'entrée.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+
+<header class="site-header scrolled">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Rubis Événements — accueil">
+      <span class="brand-gem" aria-hidden="true">
+        <img src="assets/img/logo.svg" alt="" width="32" height="32">
+      </span>
+      <span class="brand-text"><strong>RUBIS</strong><em>Contrôle</em></span>
+    </a>
+  </div>
+</header>
+
+<main id="contenu" class="page">
+  <div class="wrap page-narrow">
+
+    <p class="eyebrow">Contrôle d'accès</p>
+    <h1>Vérifier un billet</h1>
+    <p class="lead">
+      Saisissez ou scannez le code figurant sur le billet. La vérification confirme
+      son authenticité.
+    </p>
+
+    <p class="legal-todo">
+      <strong>Ce contrôle ne détecte pas un second passage.</strong> Il prouve qu'un
+      billet est authentique, pas qu'il n'a pas déjà servi. Tenez une liste des codes
+      admis, ou activez un stockage partagé — voir la section « contrôle d'accès » du
+      README.
+    </p>
+
+    <form class="devis-form" id="verifForm" novalidate>
+      <div class="field">
+        <label for="f-code">Code du billet</label>
+        <input type="text" id="f-code" name="code" autocomplete="off" autocapitalize="characters"
+               spellcheck="false" placeholder="RUBIS-GALA2026-A1B2C3-01-1A2B3C4D"
+               aria-describedby="err-f-code">
+        <p class="err" id="err-f-code" data-for="f-code"></p>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="verifBtn">
+        <span class="btn-label">Vérifier</span>
+        <span class="btn-spinner" aria-hidden="true"></span>
+      </button>
+    </form>
+
+    <div class="verdict" id="verdict" role="status" aria-live="assertive" hidden></div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-bottom">
+    <p>© <span id="year">2026</span> Rubis Événements</p>
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+<script src="assets/js/verifier-billet.js" defer></script>
+</body>
+</html>

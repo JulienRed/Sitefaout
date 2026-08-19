@@ -14,6 +14,8 @@ PAGES = {
     "merci.html":            ("merci.html", "Demande envoyée"),
     "mentions-legales.html": ("mentions-legales.html", "Mentions légales"),
     "confidentialite.html":  ("confidentialite.html", "Politique de confidentialité"),
+    "billetterie.html":      ("billetterie.html", "Billetterie"),
+    "cgv.html":              ("cgv.html", "Conditions de vente"),
 }
 for f in sorted(glob.glob("packs/*.html")):
     PAGES[f] = (f, "Pack")

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Billetterie — Rubis Événements</title>
+<meta name="description" content="Réservez vos places pour les événements Rubis Événements : gala annuel, matinales et conventions professionnelles. Paiement sécurisé, billets envoyés par e-mail.">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<meta property="og:title" content="Billetterie — Rubis Événements">
+<meta property="og:description" content="Réservez vos places pour nos événements. Paiement sécurisé, billets envoyés par e-mail.">
+<meta property="og:type" content="website">
+<link rel="preload" href="assets/fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
+<!-- socle social & icônes — généré par tools/appliquer-meta.py -->
+<link rel="canonical" href="https://www.rubis-evenements.fr/billetterie.html">
+<meta property="og:url" content="https://www.rubis-evenements.fr/billetterie.html">
+<meta property="og:site_name" content="Rubis Événements">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:image" content="https://www.rubis-evenements.fr/assets/img/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Rubis Événements — agence événementielle corporate">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://www.rubis-evenements.fr/assets/img/og-cover.png">
+<link rel="apple-touch-icon" href="assets/img/favicon-180.png">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<!-- /socle -->
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header scrolled" id="top">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Rubis Événements — accueil">
+      <span class="brand-gem" aria-hidden="true">
+        <img src="assets/img/logo.svg" alt="" width="32" height="32">
+      </span>
+      <span class="brand-text"><strong>RUBIS</strong><em>Événements</em></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Navigation principale">
+      <a href="index.html#packs">Packs</a>
+      <a href="index.html#realisations">Réalisations</a>
+      <a href="billetterie.html" class="active">Billetterie</a>
+      <a class="btn btn-primary nav-cta" href="index.html#devis">Demander un devis</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="header-progress" id="progress"></div>
+</header>
+
+<main id="contenu">
+
+  <nav class="fil" aria-label="Fil d'Ariane">
+    <div class="wrap">
+      <a href="index.html">Accueil</a>
+      <span aria-hidden="true">›</span>
+      <span aria-current="page">Billetterie</span>
+    </div>
+  </nav>
+
+  <section class="pack-hero">
+    <div class="wrap">
+      <p class="eyebrow">Billetterie</p>
+      <h1>Nos événements ouverts à la réservation</h1>
+      <p class="lead">
+        Gala, matinales et conventions : réservez vos places en quelques clics.
+        Le paiement est traité par Stripe, vos billets arrivent par e-mail dans la foulée.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="evenements">
+    <div class="wrap">
+
+      <p class="billetterie-annonce" id="annonce" role="status" aria-live="polite" hidden></p>
+
+      <div id="chargement" class="billetterie-chargement">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>Chargement des événements…</p>
+      </div>
+
+      <div class="evenements" id="liste"></div>
+
+    </div>
+  </section>
+
+  <section class="section section-faq">
+    <div class="wrap faq-inner">
+      <header class="sec-head">
+        <p class="eyebrow">Questions fréquentes</p>
+        <h2>À propos de la billetterie</h2>
+      </header>
+      <div class="faq">
+        <details>
+          <summary>Comment reçoit-on ses billets ?</summary>
+          <p>Par e-mail, immédiatement après le paiement, à l'adresse saisie pendant le règlement. Chaque billet porte un code unique et un QR code joint au message. Si rien n'arrive dans les minutes qui suivent, vérifiez vos indésirables puis écrivez-nous.</p>
+        </details>
+        <details>
+          <summary>Les billets sont-ils nominatifs ?</summary>
+          <p>Non. Un billet admet une personne, quelle qu'elle soit. Vous pouvez donc en offrir ou en transmettre, à condition de ne pas diffuser deux fois le même code : le premier présenté sera le seul admis.</p>
+        </details>
+        <details>
+          <summary>Peut-on annuler ou se faire rembourser ?</summary>
+          <p>Pour les événements datés de loisir, le droit de rétractation de quatorze jours ne s'applique pas — c'est une exception prévue par le code de la consommation. Nos conditions de vente précisent les cas d'annulation et de remboursement.</p>
+        </details>
+        <details>
+          <summary>Comment payer par virement ou sur facture ?</summary>
+          <p>Pour une commande groupée ou une facturation entreprise, écrivez-nous : nous établissons une facture et vous transmettons les billets à réception du règlement.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-bottom">
+    <p>© <span id="year">2026</span> Rubis Événements — Tous droits réservés.</p>
+    <p>
+      <a href="cgv.html">Conditions de vente</a> ·
+      <a href="mentions-legales.html">Mentions légales</a> ·
+      <a href="confidentialite.html">Politique de confidentialité</a>
+    </p>
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+<script src="assets/js/billetterie.js" defer></script>
+</body>
+</html>

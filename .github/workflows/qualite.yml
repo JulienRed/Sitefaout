@@ -31,7 +31,10 @@ jobs:
 
       - name: Vérifier qu'aucun secret n'a été committé
         run: |
-          if grep -rIn -E '(re_[A-Za-z0-9]{20,}|21st_sk_[a-f0-9]{40,}|0x4[A-Za-z0-9]{30,})' \
+          MOTIFS='(re_[A-Za-z0-9]{20,}|21st_sk_[a-f0-9]{40,}|0x4[A-Za-z0-9]{30,}'
+          MOTIFS="$MOTIFS"'|sk_(test|live)_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,}'
+          MOTIFS="$MOTIFS"'|pk_(test|live)_[A-Za-z0-9]{20,})'
+          if grep -rIn -E "$MOTIFS" \
                --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.claude . ; then
             echo "::error::Une clé secrète semble présente dans le dépôt."
             exit 1

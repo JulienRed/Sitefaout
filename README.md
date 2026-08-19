@@ -11,6 +11,10 @@ via une fonction serverless.
 index.html               page principale (hero, expertises, packs, réalisations,
                          méthode, engagements, références, FAQ, devis)
 packs/*.html             six pages dédiées, une par pack (générées)
+billetterie.html         vente de billets en ligne
+cgv.html                 conditions générales de vente
+verifier-billet.html     contrôle des billets à l'entrée
+data/billetterie.json    catalogue des événements (fait autorité)
 404.html                 page d'erreur
 robots.txt, sitemap.xml  socle d'indexation (générés)
 merci.html               confirmation après envoi — c'est elle qui rend la
@@ -27,6 +31,9 @@ tools/                   générateurs et audit automatisé
 .github/workflows/       contrôle qualité à chaque push et pull request
 
 server/devis.js          traitement du devis (validation, anti-robot, e-mails)
+server/billetterie.js    catalogue, quotas et création du paiement Stripe
+server/billets.js        émission et vérification des codes de billets
+server/stripe-webhook.js émission des billets après paiement confirmé
 netlify/functions/       adaptateur Netlify
 api/devis.js             adaptateur Vercel
 netlify.toml             publication + en-têtes + redirection /api/devis
@@ -72,6 +79,10 @@ Voir `.env.example`. À définir dans l'interface de l'hébergeur, jamais dans l
 | `DEVIS_BCC` | copie cachée interne (facultatif) |
 | `SITE_NAME` | nom affiché dans les e-mails (facultatif) |
 | `TURNSTILE_SECRET` | clé secrète Cloudflare Turnstile — nécessaire à l'accusé de réception |
+| `STRIPE_SECRET_KEY` | clé secrète Stripe — obligatoire pour la billetterie |
+| `STRIPE_WEBHOOK_SECRET` | secret de signature du webhook Stripe |
+| `BILLET_SECRET` | clé de signature des billets, 32 caractères minimum |
+| `SITE_URL` | base des URL de retour après paiement |
 
 ### Anti-robot Turnstile (recommandé)
 
@@ -211,6 +222,71 @@ python3 tools/appliquer-meta.py        # canonical, OG, icônes
 node tools/generer-images.mjs          # og-cover.png et favicons
 ```
 
+## Billetterie
+
+Vente de billets en ligne, paiement par **Stripe Checkout** : la page de paiement
+est hébergée par Stripe, aucune donnée de carte ne transite par ce site.
+
+### Le chemin d'une commande
+
+1. `billetterie.html` charge le catalogue depuis `/api/billetterie`.
+2. Le visiteur choisit ses billets. **Le navigateur n'envoie que des
+   identifiants et des quantités** : un panier arrivant avec « prix : 1 centime »
+   serait simplement ignoré, le serveur recalcule tout depuis
+   `data/billetterie.json`.
+3. `/api/paiement` vérifie le panier, contrôle le quota, crée la session Stripe
+   et renvoie l'URL de paiement.
+4. Stripe encaisse, puis appelle `/api/stripe-webhook`. **C'est là, et nulle part
+   ailleurs, que les billets sont émis** : rien de ce qui vient du navigateur ne
+   prouve un paiement, et un acheteur peut fermer l'onglet avant le retour.
+5. La signature de chaque webhook est vérifiée avant toute action, avec une
+   tolérance de cinq minutes contre le rejeu. Sans cela, n'importe qui pourrait
+   poster un faux « paiement réussi » et se faire émettre des billets.
+6. Les billets partent par e-mail, avec un QR code par billet en pièce jointe,
+   et une copie interne à l'agence.
+
+### Les codes de billets
+
+Aucun billet n'est stocké : le code porte sa propre preuve. Il est signé en
+HMAC-SHA256 avec `BILLET_SECRET`, donc impossible à fabriquer sans la clé et
+vérifiable hors ligne. Format :
+`RUBIS-<événement>-<commande>-<n°>-<signature>`.
+
+La comparaison des signatures est faite en temps constant : un `===` laisserait
+fuir, par le temps de réponse, le nombre de caractères déjà corrects.
+
+### Contrôle d'accès — la limite à connaître
+
+`verifier-billet.html` prouve qu'un billet est **authentique**. Il ne prouve pas
+qu'il n'a **pas déjà servi** : interdire le second passage demande un état
+partagé entre les points de contrôle, donc un stockage. Trois options, par ordre
+d'effort :
+
+- tenir la liste des codes admis sur place (suffisant en dessous de 200 entrées) ;
+- brancher un magasin clé-valeur (Netlify Blobs, Vercel KV, Upstash) et marquer
+  chaque code au premier scan — une trentaine de lignes dans `server/billets.js` ;
+- passer à une vraie base si vous vendez régulièrement.
+
+Le quota souffre de la même limite : il est contrôlé juste avant paiement en
+comptant les sessions Stripe déjà payées, mais ce n'est pas une réservation.
+Deux acheteurs simultanés sur la dernière place peuvent tous deux passer — le
+remboursement reste possible.
+
+### Mise en service
+
+1. Compte Stripe, puis `STRIPE_SECRET_KEY` (commencez en `sk_test_…`).
+2. Webhook sur `https://votre-domaine/api/stripe-webhook`, événement
+   `checkout.session.completed` → `STRIPE_WEBHOOK_SECRET`.
+3. `BILLET_SECRET` : 32 caractères aléatoires (`openssl rand -base64 32`).
+   **La changer invalide tous les billets déjà émis.**
+4. `SITE_URL` pour les URL de retour après paiement.
+5. Remplacer les événements de `data/billetterie.json` par les vrais.
+6. Faire relire `cgv.html` par un juriste avant d'ouvrir la vente.
+
+Sans `STRIPE_SECRET_KEY`, la page s'affiche et explique que la billetterie n'est
+pas encore ouverte, en invitant à écrire à l'agence : aucun visiteur ne tombe
+sur une erreur brute.
+
 ## Contrôle qualité automatisé
 
 `node tools/audit.mjs` rejoue, sur les onze pages, les vérifications qui sinon se
@@ -284,6 +360,13 @@ Tout est en CSS/SVG, en cycles lents de 6 à 9 s, en monochrome rouge.
 2. **Logos clients** du bandeau « Ils nous font confiance » — les six noms
    actuels sont fictifs.
 3. **Témoignages** : les trois citations sont des exemples.
+4. **Billetterie** : les trois événements de `data/billetterie.json`, leurs dates
+   et leurs tarifs sont fictifs. Les conditions de vente doivent être relues par
+   un juriste.
+5. **Offres à venir** : le bandeau « Bientôt disponible » sous le hero attend le
+   périmètre et le tarif du Pack Essentiel et du Pack Sur-mesure. À arbitrer :
+   « Pack Sur-mesure » existe déjà et est commandable — le même nom ne peut pas
+   être à la fois disponible et bientôt disponible.
 4. **Réalisations** : les six études de cas et leurs chiffres sont fictifs. Les
    scènes SVG peuvent rester telles quelles, ou céder la place à vos photos
    (prévoir AVIF/WebP, `loading="lazy"` et dimensions explicites).

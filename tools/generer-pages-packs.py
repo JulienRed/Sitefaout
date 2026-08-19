@@ -489,7 +489,9 @@ def main():
     aujourd_hui = datetime.date.today().isoformat()
     urls = [(SITE + "/", "1.0", "weekly")]
     urls += [(f"{SITE}/packs/{p['slug']}.html", "0.8", "monthly") for p in PACKS]
-    urls += [(f"{SITE}/mentions-legales.html", "0.2", "yearly"),
+    urls += [(f"{SITE}/billetterie.html", "0.9", "daily"),
+             (f"{SITE}/cgv.html", "0.2", "yearly"),
+             (f"{SITE}/mentions-legales.html", "0.2", "yearly"),
              (f"{SITE}/confidentialite.html", "0.2", "yearly")]
     corps = "\n".join(
         f"  <url>\n    <loc>{u}</loc>\n    <lastmod>{aujourd_hui}</lastmod>\n"
@@ -505,6 +507,8 @@ def main():
         f.write(f"""User-agent: *
 Allow: /
 Disallow: /merci.html
+Disallow: /billetterie-confirmation.html
+Disallow: /verifier-billet.html
 Disallow: /api/
 
 Sitemap: {SITE}/sitemap.xml

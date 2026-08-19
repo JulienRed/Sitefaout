@@ -1,5 +1,5 @@
 /* =========================================================
-   RUBIS Événements — scripts
+   EDB Événement — scripts
    ========================================================= */
 (function () {
   'use strict';
@@ -27,7 +27,7 @@
 
      ANALYTICS_DOMAIN
        Domaine déclaré dans Plausible, par exemple
-       'rubis-evenements.fr'. Renseigné, le script de mesure est
+       'edb-evenement.fr'. Renseigné, le script de mesure est
        chargé et l'envoi d'un devis est compté comme objectif.
        Plausible ne dépose aucun cookie : pas de bandeau de
        consentement, et la politique de confidentialité reste
@@ -42,7 +42,7 @@
     API_ENDPOINT:      '/api/devis',
     TURNSTILE_SITE_KEY: '',
     SUCCESS_PAGE:      'merci.html',
-    CONTACT_EMAIL:     'contact@rubis-evenements.fr',
+    CONTACT_EMAIL:     'contact@edb-evenement.fr',
     ANALYTICS_DOMAIN:  '',
     RDV_URL:           '',
 
@@ -728,7 +728,7 @@
     var subject = 'Demande de devis — ' + (data.pack || 'événement') +
                   ' — ' + (data.societe || data.nom);
     var body    = 'Bonjour,\n\nVoici notre demande de devis :\n\n' + toText(data) +
-                  '\n\nDemande envoyée depuis le site Rubis Événements.';
+                  '\n\nDemande envoyée depuis le site EDB Événement.';
     window.location.href = 'mailto:' + CONFIG.CONTACT_EMAIL +
       '?subject=' + encodeURIComponent(subject) +
       '&body='    + encodeURIComponent(body);

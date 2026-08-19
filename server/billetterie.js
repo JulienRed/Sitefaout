@@ -13,7 +13,7 @@
 
    Variables d'environnement :
      STRIPE_SECRET_KEY   clé secrète Stripe (sk_live_… / sk_test_…)
-     SITE_URL            base des URL de retour, ex. https://www.rubis-evenements.fr
+     SITE_URL            base des URL de retour, ex. https://www.edb-evenement.fr
    ========================================================= */
 
 'use strict';

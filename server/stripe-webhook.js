@@ -132,7 +132,7 @@ async function envoyerBillets(session) {
   var evenementNom = (session.metadata && session.metadata.evenement_nom) || 'votre événement';
 
   var emission = billets.emettre(evenementId, session.id, quantite);
-  var siteName = process.env.SITE_NAME || 'Rubis Événements';
+  var siteName = process.env.SITE_NAME || 'EDB Événement';
   var contact = process.env.DEVIS_TO || '';
 
   /* Un QR par billet, joint au message. */

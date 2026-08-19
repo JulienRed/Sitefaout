@@ -15,7 +15,7 @@
   /* Un code scanné peut arriver comme URL complète : on ne garde que le code. */
   function extraire(saisie) {
     var texte = String(saisie || '').trim();
-    var trouve = texte.match(/RUBIS-[A-Za-z0-9]+-[A-Za-z0-9]+-\d+-[A-Fa-f0-9]+/);
+    var trouve = texte.match(/EDB-[A-Za-z0-9]+-[A-Za-z0-9]+-\d+-[A-Fa-f0-9]+/);
     return trouve ? trouve[0].toUpperCase() : texte.toUpperCase();
   }
 

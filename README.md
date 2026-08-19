@@ -1,4 +1,4 @@
-# RUBIS Événements — site vitrine
+# EDB Événement — site vitrine
 
 Site vitrine pour une agence événementielle **corporate (B2B)** : séminaires,
 conventions, lancements produit, soirées de gala, team building. Thème noir &
@@ -43,14 +43,41 @@ vercel.json              en-têtes
 .claude/skills/          bundle de skills design ui-ux-pro-max
 ```
 
-Aucune dépendance, aucun build. En local :
+## Lancer le site en local
 
 ```bash
-npx http-server -p 8080 .
+npm install     # une seule fois — installe playwright et qrcode
+npm start       # http://localhost:8080
 ```
 
-Sans fonction serverless, le formulaire bascule automatiquement sur le client
-mail du visiteur : le site reste utilisable tel quel.
+**Servez toujours le site par ce serveur, jamais en ouvrant les fichiers HTML
+directement.** Les pages appellent `/api/…` ; sans serveur derrière, la
+billetterie affiche « la billetterie n'est pas encore accessible » et le
+formulaire de devis bascule sur le client mail.
+
+Le serveur s'adapte à ce qui est configuré :
+
+| Sans | Comportement |
+|---|---|
+| `STRIPE_SECRET_KEY` | paiement **simulé** : un écran local remplace la page Stripe, puis un webhook signé est rejoué vers le vrai gestionnaire — toute la chaîne s'exécute, sans banque |
+| `RESEND_API_KEY` | e-mails **écrits sur disque** dans `.local/emails/`, consultables sur `/__emails`, QR codes compris |
+
+Avec les vraies clés dans l'environnement, le comportement est identique à la
+production.
+
+> **L'écran de paiement simulé n'existe que dans `tools/serveur-local.mjs`**, qui
+> n'est jamais déployé. Aucun chemin de production ne permet d'émettre un billet
+> sans passer par Stripe.
+
+### Essai complet en une minute
+
+1. `npm start`
+2. Ouvrez `/billetterie.html`, choisissez des billets, cliquez **Réserver**.
+3. Sur l'écran de paiement simulé, validez.
+4. La page de confirmation affiche la référence de commande.
+5. Ouvrez `/__emails` : les billets et leurs QR codes sont là.
+6. Copiez un code dans `/verifier-billet.html` — il doit être accepté ; changez
+   un caractère, il doit être refusé.
 
 ## Mise en ligne
 
@@ -213,7 +240,7 @@ python3 tools/generer-visuels-realisations.py
   produisait une carte vide — aucun réseau social n'affiche un SVG en aperçu.
 
 Le domaine est défini une seule fois, en tête de `tools/appliquer-meta.py` et de
-`tools/generer-pages-packs.py` (`SITE = "https://www.rubis-evenements.fr"`).
+`tools/generer-pages-packs.py` (`SITE = "https://www.edb-evenement.fr"`).
 Après modification :
 
 ```bash
@@ -307,7 +334,7 @@ est hébergée par Stripe, aucune donnée de carte ne transite par ce site.
 Aucun billet n'est stocké : le code porte sa propre preuve. Il est signé en
 HMAC-SHA256 avec `BILLET_SECRET`, donc impossible à fabriquer sans la clé et
 vérifiable hors ligne. Format :
-`RUBIS-<événement>-<commande>-<n°>-<signature>`.
+`EDB-<événement>-<commande>-<n°>-<signature>`.
 
 La comparaison des signatures est faite en temps constant : un `===` laisserait
 fuir, par le temps de réponse, le nombre de caractères déjà corrects.

@@ -6,8 +6,8 @@ Idempotent : relancer le script ne duplique rien.
 """
 import glob, os, re
 
-SITE = "https://www.rubis-evenements.fr"   # ← domaine définitif à ajuster ici
-NOM = "Rubis Événements"
+SITE = "https://www.edb-evenement.fr"   # ← domaine définitif à ajuster ici
+NOM = "EDB Événement"
 
 PAGES = {
     "index.html":            ("", "Agence événementielle corporate"),

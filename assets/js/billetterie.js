@@ -1,5 +1,5 @@
 /* =========================================================
-   RUBIS Événements — billetterie
+   EDB Événement — billetterie
    ---------------------------------------------------------
    Le navigateur n'envoie que des identifiants et des quantités.
    Les prix affichés ici viennent du serveur et n'ont qu'une
@@ -11,7 +11,7 @@
 
   var API_CATALOGUE = '/api/billetterie';
   var API_PAIEMENT  = '/api/paiement';
-  var CONTACT       = 'contact@rubis-evenements.fr';
+  var CONTACT       = 'contact@edb-evenement.fr';
 
   var $  = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };

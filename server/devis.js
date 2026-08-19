@@ -8,11 +8,11 @@
 
    Variables d'environnement attendues :
      RESEND_API_KEY    clé API Resend (https://resend.com)
-     DEVIS_FROM        expéditeur vérifié, ex. "Rubis Événements <devis@rubis-evenements.fr>"
-     DEVIS_TO          destinataire interne, ex. "contact@rubis-evenements.fr"
+     DEVIS_FROM        expéditeur vérifié, ex. "EDB Événement <devis@edb-evenement.fr>"
+     DEVIS_TO          destinataire interne, ex. "contact@edb-evenement.fr"
      DEVIS_BCC         copie cachée interne (facultatif)
      TURNSTILE_SECRET  clé secrète Cloudflare Turnstile (facultatif mais recommandé)
-     SITE_NAME         nom affiché dans les e-mails (défaut : Rubis Événements)
+     SITE_NAME         nom affiché dans les e-mails (défaut : EDB Événement)
    ========================================================= */
 
 'use strict';
@@ -352,7 +352,7 @@ async function handleDevis(body, context) {
     };
   }
 
-  var siteName = process.env.SITE_NAME || 'Rubis Événements';
+  var siteName = process.env.SITE_NAME || 'EDB Événement';
   var sujet = 'Demande de devis — ' + safeHeader(str(data.pack)) +
               ' — ' + safeHeader(str(data.societe));
 

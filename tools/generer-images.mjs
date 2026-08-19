@@ -23,7 +23,7 @@ const ROUGE = '#c8102e';
 const ROUGE_CLAIR = '#e2233d';
 
 /* Le rubis, en SVG inline pour rester indépendant du système de fichiers. */
-const RUBIS = (taille) => `
+const GEMME = (taille) => `
 <svg viewBox="0 0 100 100" width="${taille}" height="${taille}">
   <defs>
     <linearGradient id="t" x1="0" y1="0" x2="1" y2="1">
@@ -80,11 +80,11 @@ h1 span{ color:${ROUGE_CLAIR}; }
       filter:drop-shadow(0 24px 60px rgba(200,16,46,.55)); }
 </style></head><body>
 <div class="grille"></div><div class="halo"></div>
-<div class="gem">${RUBIS(238)}</div>
+<div class="gem">${GEMME(238)}</div>
 <div class="contenu">
   <div class="marque">
-    ${RUBIS(52)}
-    <div><strong>RUBIS</strong><em>Événements</em></div>
+    ${GEMME(52)}
+    <div><strong>EDB</strong><em>Événement</em></div>
   </div>
   <h1>Vos événements d'entreprise, <span>de bout en bout</span>.</h1>
   <div class="pied">
@@ -101,7 +101,7 @@ ${STYLE_COMMUN}
 body{ width:${taille}px; height:${taille}px; display:grid; place-items:center;
       background:${fond}; }
 svg{ width:${Math.round(taille * 0.74)}px; height:${Math.round(taille * 0.74)}px; }
-</style></head><body>${RUBIS(taille)}</body></html>`;
+</style></head><body>${GEMME(taille)}</body></html>`;
 
 const navigateur = await chromium.launch();
 

@@ -5,4 +5,4 @@ Disallow: /billetterie-confirmation.html
 Disallow: /verifier-billet.html
 Disallow: /api/
 
-Sitemap: https://www.rubis-evenements.fr/sitemap.xml
+Sitemap: https://www.edb-evenement.fr/sitemap.xml

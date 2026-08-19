@@ -5,7 +5,7 @@
     {
       "id": "gala-2026",
       "nom": "Gala annuel de l'événementiel",
-      "sous_titre": "Dîner de gala et remise des Rubis d'Or",
+      "sous_titre": "Dîner de gala et remise des Trophées EDB",
       "date_debut": "2026-11-20T19:00:00+01:00",
       "date_fin": "2026-11-21T02:00:00+01:00",
       "lieu": "Pavillon des Lumières",
@@ -26,7 +26,7 @@
       "sous_titre": "Retours d'expérience et atelier de cadrage",
       "date_debut": "2026-09-17T08:30:00+02:00",
       "date_fin": "2026-09-17T12:30:00+02:00",
-      "lieu": "Studio Rubis",
+      "lieu": "Studio EDB",
       "adresse": "12 rue des Lumières, 75011 Paris",
       "description": "Deux heures de retours d'expérience sur l'organisation de séminaires, suivies d'un atelier de cadrage en petit groupe. Petit-déjeuner inclus.",
       "visuel": "seminaire",

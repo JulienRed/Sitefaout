@@ -9,8 +9,8 @@ balisage Service + BreadcrumbList.
 """
 import os, json, datetime
 
-SITE = "https://www.rubis-evenements.fr"
-NOM = "Rubis Événements"
+SITE = "https://www.edb-evenement.fr"
+NOM = "EDB Événement"
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ── Scènes animées, reprises de la page d'accueil ────────────────────────
@@ -259,7 +259,7 @@ def page(p, autres):
   <div class="wrap header-inner">
     <a class="brand" href="../index.html" aria-label="{NOM} — accueil">
       <span class="brand-gem" aria-hidden="true">{LOGO}</span>
-      <span class="brand-text"><strong>RUBIS</strong><em>Événements</em></span>
+      <span class="brand-text"><strong>EDB</strong><em>Événement</em></span>
     </a>
     <nav class="nav" id="nav" aria-label="Navigation principale">
       <a href="../index.html#expertises">Expertises</a>

@@ -6,8 +6,8 @@
    impossible à fabriquer sans la clé, et vérifiable hors ligne
    par le serveur sans base de données.
 
-   Format : RUBIS-<evenement>-<commande>-<n>-<signature>
-   Exemple : RUBIS-GALA2026-8F3K2A-01-4B7E9C12
+   Format : EDB-<evenement>-<commande>-<n>-<signature>
+   Exemple : EDB-GALA2026-8F3K2A-01-4B7E9C12
 
    LIMITE ASSUMÉE — la signature prouve qu'un billet est
    authentique, pas qu'il n'a pas déjà été scanné. Interdire le
@@ -57,7 +57,7 @@ function emettre(evenementId, idSession, quantite) {
     var numero = String(n).padStart(2, '0');
     billets.push({
       numero: n,
-      code: ['RUBIS', evenement, commande, numero,
+      code: ['EDB', evenement, commande, numero,
              signature(evenement, commande, numero)].join('-')
     });
   }
@@ -68,7 +68,7 @@ function emettre(evenementId, idSession, quantite) {
    fuir, par le temps de réponse, le nombre de caractères déjà corrects. */
 function verifier(code) {
   var morceaux = String(code || '').trim().toUpperCase().split('-');
-  if (morceaux.length !== 5 || morceaux[0] !== 'RUBIS') {
+  if (morceaux.length !== 5 || morceaux[0] !== 'EDB') {
     return { valide: false, raison: 'Format de code invalide.' };
   }
 

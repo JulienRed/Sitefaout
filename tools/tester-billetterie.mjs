@@ -27,9 +27,9 @@ process.env.BILLET_SECRET = process.env.BILLET_SECRET ||
 process.env.STRIPE_SECRET_KEY = 'sk_banc_essai';
 process.env.STRIPE_WEBHOOK_SECRET = 'whsec_banc_essai';
 process.env.RESEND_API_KEY = 'banc_essai';
-process.env.DEVIS_FROM = 'Rubis Événements <devis@exemple.test>';
+process.env.DEVIS_FROM = 'EDB Événement <devis@exemple.test>';
 process.env.DEVIS_TO = 'contact@exemple.test';
-process.env.SITE_NAME = 'Rubis Événements';
+process.env.SITE_NAME = 'EDB Événement';
 process.env.SITE_URL = 'https://exemple.test';
 
 /* --- Doublures ------------------------------------------------------ */
@@ -184,7 +184,7 @@ const messageAcheteur = envois.emails.find((m) => m.to.includes('acheteur@exempl
 verifier('un QR par billet est joint',
   (messageAcheteur.attachments || []).length === QUANTITE,
   (messageAcheteur.attachments || []).length + ' pièce(s) jointe(s)');
-const codes = messageAcheteur.text.match(/RUBIS-[A-Z0-9-]+/g) || [];
+const codes = messageAcheteur.text.match(/EDB-[A-Z0-9-]+/g) || [];
 verifier('autant de codes que de billets', codes.length === QUANTITE);
 verifier('les codes sont tous distincts', new Set(codes).size === codes.length);
 
@@ -195,7 +195,7 @@ verifier('un billet émis est reconnu', billets.verifier(bon).valide === true);
 const falsifie = bon.slice(0, -1) + (bon.slice(-1) === 'A' ? 'B' : 'A');
 verifier('une signature modifiée est rejetée', billets.verifier(falsifie).valide === false);
 verifier('un code inventé est rejeté',
-  billets.verifier('RUBIS-XXXX-ABCDEF-01-DEADBEEF').valide === false);
+  billets.verifier('EDB-XXXX-ABCDEF-01-DEADBEEF').valide === false);
 verifier('un code mal formé est rejeté', billets.verifier('bonjour').valide === false);
 
 /* --- 7. Résumé de commande ------------------------------------------ */

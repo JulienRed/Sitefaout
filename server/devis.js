@@ -18,11 +18,7 @@
 'use strict';
 
 var PACKS = [
-  'Pack Séminaire',
-  'Pack Convention',
-  'Pack Lancement produit',
-  'Pack Soirée de gala',
-  'Pack Team building',
+  'Pack Essentiel',
   'Pack Sur-mesure',
   'À définir ensemble'
 ];

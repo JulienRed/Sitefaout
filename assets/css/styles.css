@@ -346,6 +346,38 @@ p{ margin:0 0 1rem; }
 .price small{ font-size:.7rem; color:var(--texte-faible); letter-spacing:.1em; text-transform:uppercase; }
 .price strong{ font-size:1.5rem; font-weight:700; letter-spacing:-.03em; color:#fff; }
 
+/* --- Quatre packs : deux disponibles, deux en préparation --- */
+.packs-quatre{ grid-template-columns:repeat(4,1fr); }
+.packs-quatre .pack,
+.packs-quatre .pack:nth-child(4),
+.packs-quatre .pack:nth-child(5){ grid-column:auto; }
+
+/* Le statut doit se lire d'un coup d'œil : l'un est un aplat plein,
+   l'autre un contour discret avec une pastille qui bat. */
+.pack-badge-dispo{ background:var(--rouge); border:1px solid var(--rouge); }
+.pack-badge-attente{
+  display:inline-flex; align-items:center; gap:.45rem;
+  background:rgba(11,12,14,.86); color:var(--texte-doux);
+  border:1px solid var(--bord-clair); backdrop-filter:blur(6px);
+}
+.pack-badge-attente .pastille{
+  width:6px; height:6px; background:var(--rouge-clair);
+  animation:pastilleBat 2.6s ease-out infinite;
+}
+
+/* Une offre non commandable ne doit pas rivaliser visuellement avec
+   celles qui le sont : sa scène est retenue, son cadre plus sobre. */
+.pack-attente .pack-anim{ filter:saturate(.5) brightness(.8); }
+.pack-attente:hover .pack-anim{ filter:saturate(.85) brightness(1.1); }
+.pack-attente .pack-desc{ margin-bottom:1.5rem; }
+
+@media (max-width:1200px){
+  .packs-quatre{ grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width:620px){
+  .packs-quatre{ grid-template-columns:1fr; }
+}
+
 /* ====== 1. Séminaire : plan de salle balayé par la lumière ====== */
 .anim-seminaire .stage{
   position:absolute; left:50%; top:26px; width:112px; height:3px; margin-left:-56px;
@@ -1499,6 +1531,52 @@ p{ margin:0 0 1rem; }
 }
 @media (pointer: coarse){
   .compteur button{ width:44px; height:44px; }
+}
+
+/* =========================================================
+   BANDEAU D'ANNONCE
+   ---------------------------------------------------------
+   Fixé tout en haut, au-dessus de l'en-tête. Sa hauteur est
+   publiée dans --annonce-h : l'en-tête, l'ancrage des liens
+   internes et le hero s'en servent pour ne pas se chevaucher.
+   ========================================================= */
+:root{ --annonce-h:0px; }
+
+.annonce-haut{
+  position:fixed; inset:0 0 auto 0; z-index:120;
+  background:linear-gradient(90deg,var(--rouge-sombre),var(--rouge) 45%,var(--rouge-sombre));
+  color:#fff;
+  border-bottom:1px solid rgba(0,0,0,.25);
+}
+.annonce-inner{
+  display:flex; align-items:center; justify-content:center; gap:.75rem;
+  min-height:40px; padding:.45rem 0;
+}
+.annonce-pastille{
+  width:7px; height:7px; border-radius:50%; background:#fff; flex:none;
+  box-shadow:0 0 0 0 rgba(255,255,255,.7); animation:pastilleBat 2.6s ease-out infinite;
+}
+.annonce-texte{
+  margin:0; display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;
+  justify-content:center; text-align:center;
+  font-size:.85rem; letter-spacing:.02em;
+}
+.annonce-texte strong{ font-weight:600; }
+.annonce-compte{ color:rgba(255,255,255,.82); font-variant-numeric:tabular-nums; }
+.annonce-compte:empty{ display:none; }
+
+/* Décalage de tout ce qui est fixe ou ancré. */
+body:has(.annonce-haut) .site-header{ top:var(--annonce-h); }
+body:has(.annonce-haut){ scroll-padding-top:calc(90px + var(--annonce-h)); }
+html:has(.annonce-haut){ scroll-padding-top:calc(90px + var(--annonce-h)); }
+body:has(.annonce-haut) .hero{ padding-top:calc(11rem + var(--annonce-h)); }
+body:has(.annonce-haut) .fil{ padding-top:calc(6.5rem + var(--annonce-h)); }
+body:has(.annonce-haut) .page{ padding-top:calc(9.5rem + var(--annonce-h)); }
+body:has(.annonce-haut) .nav{ top:calc(74px + var(--annonce-h)); }
+
+@media (max-width:620px){
+  .annonce-texte{ font-size:.79rem; }
+  .annonce-inner{ padding:.4rem 0; }
 }
 
 /* =========================================================

@@ -7,31 +7,7 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.rubis-evenements.fr/packs/seminaire.html</loc>
-    <lastmod>2026-08-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.rubis-evenements.fr/packs/convention.html</loc>
-    <lastmod>2026-08-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.rubis-evenements.fr/packs/lancement-produit.html</loc>
-    <lastmod>2026-08-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.rubis-evenements.fr/packs/soiree-de-gala.html</loc>
-    <lastmod>2026-08-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.rubis-evenements.fr/packs/team-building.html</loc>
+    <loc>https://www.rubis-evenements.fr/packs/essentiel.html</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

@@ -44,7 +44,13 @@
     SUCCESS_PAGE:      'merci.html',
     CONTACT_EMAIL:     'contact@rubis-evenements.fr',
     ANALYTICS_DOMAIN:  '',
-    RDV_URL:           ''
+    RDV_URL:           '',
+
+    /* Date d'ouverture annoncée par le bandeau du haut.
+       Vide = deux ans après le premier affichage, ce qui n'est pas une
+       vraie date : renseignez-la dès qu'elle est connue, au format
+       'AAAA-MM-JJ'. */
+    OUVERTURE:         ''
   };
 
   /* ---------------------------------------------------------
@@ -68,6 +74,54 @@
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $  = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+
+  /* =========================================================
+     0. Bandeau d'annonce
+     ---------------------------------------------------------
+     Sa hauteur est publiée dans --annonce-h pour que l'en-tête
+     fixe et les ancres internes se décalent d'autant, quelle
+     que soit la longueur du texte une fois replié sur mobile.
+     ========================================================= */
+  (function annonce() {
+    var barre = $('#annonceHaut');
+    if (!barre) return;
+
+    function mesurer() {
+      document.documentElement.style.setProperty(
+        '--annonce-h', barre.offsetHeight + 'px');
+    }
+    mesurer();
+    window.addEventListener('resize', mesurer);
+    if (window.ResizeObserver) new ResizeObserver(mesurer).observe(barre);
+
+    var compte = $('#annonceCompte');
+    if (!compte) return;
+
+    var cible = CONFIG.OUVERTURE ? new Date(CONFIG.OUVERTURE + 'T00:00:00') : null;
+    if (!cible || isNaN(cible)) {
+      cible = new Date();
+      cible.setFullYear(cible.getFullYear() + 2);
+    }
+
+    function restant() {
+      var jours = Math.ceil((cible - Date.now()) / 86400000);
+      if (jours <= 0) { compte.textContent = ''; return; }
+      if (jours > 60) {
+        var mois = Math.round(jours / 30.44);
+        if (mois >= 12) {
+          var ans = Math.floor(mois / 12), reste = mois % 12;
+          compte.textContent = '· dans ' + ans + (ans > 1 ? ' ans' : ' an') +
+            (reste ? ' et ' + reste + ' mois' : '');
+        } else {
+          compte.textContent = '· dans ' + mois + ' mois';
+        }
+      } else {
+        compte.textContent = '· dans ' + jours + ' jour' + (jours > 1 ? 's' : '');
+      }
+    }
+    restant();
+    window.setInterval(restant, 3600000);
+  }());
 
   /* =========================================================
      1. Header : fond au scroll + barre de progression
@@ -415,11 +469,7 @@
   /* -- pré-sélection depuis l'URL : ?pack=convention --
         Les pages dédiées renvoient vers le formulaire avec ce paramètre. -- */
   var SLUGS = {
-    'seminaire': 'Pack Séminaire',
-    'convention': 'Pack Convention',
-    'lancement-produit': 'Pack Lancement produit',
-    'soiree-de-gala': 'Pack Soirée de gala',
-    'team-building': 'Pack Team building',
+    'essentiel': 'Pack Essentiel',
     'sur-mesure': 'Pack Sur-mesure'
   };
 

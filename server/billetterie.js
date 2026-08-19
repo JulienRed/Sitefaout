@@ -154,7 +154,11 @@ function validerPanier(donnees) {
     var categorie = evenement.categories.find(function (c) { return c.id === demande.categorie; });
     if (!categorie) return { erreur: 'Catégorie de billet inconnue.' };
 
-    var quantite = parseInt(demande.quantite, 10);
+    /* parseInt() acceptait « 1.5 » en le ramenant à 1, et « 3abc » à 3 :
+       une quantité qu'on n'a pas demandée est silencieusement facturée.
+       Number() rend NaN dans les deux cas, donc le panier est refusé. */
+    var brut = demande.quantite;
+    var quantite = typeof brut === 'number' ? brut : Number(String(brut).trim());
     if (!Number.isInteger(quantite) || quantite < 1) {
       return { erreur: 'Quantité invalide.' };
     }

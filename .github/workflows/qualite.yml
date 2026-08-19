@@ -41,6 +41,9 @@ jobs:
           fi
           echo "Aucun secret détecté."
 
+      - name: Banc d'essai de la billetterie
+        run: node tools/tester-billetterie.mjs
+
       - name: Auditer le site
         run: node tools/audit.mjs
 

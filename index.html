@@ -63,40 +63,8 @@
           "@type": "Offer",
           "itemOffered": {
             "@type": "Service",
-            "name": "Pack Séminaire",
-            "url": "https://www.rubis-evenements.fr/packs/seminaire.html"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Pack Convention",
-            "url": "https://www.rubis-evenements.fr/packs/convention.html"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Pack Lancement produit",
-            "url": "https://www.rubis-evenements.fr/packs/lancement-produit.html"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Pack Soirée de gala",
-            "url": "https://www.rubis-evenements.fr/packs/soiree-de-gala.html"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Pack Team building",
-            "url": "https://www.rubis-evenements.fr/packs/team-building.html"
+            "name": "Pack Essentiel",
+            "url": "https://www.rubis-evenements.fr/packs/essentiel.html"
           }
         },
         {
@@ -181,6 +149,17 @@
 <div class="grain" aria-hidden="true"></div>
 
 <!-- ============ HEADER ============ -->
+<!-- ============ BANDEAU D'ANNONCE ============ -->
+<div class="annonce-haut" id="annonceHaut" role="region" aria-label="Annonce">
+  <div class="wrap annonce-inner">
+    <span class="annonce-pastille" aria-hidden="true"></span>
+    <p class="annonce-texte">
+      <strong>Ouverture dans deux ans</strong>
+      <span class="annonce-compte" id="annonceCompte"></span>
+    </p>
+  </div>
+</div>
+
 <header class="site-header" id="top">
   <div class="wrap header-inner">
     <a class="brand" href="#top" aria-label="Rubis Événements — accueil">
@@ -282,77 +261,105 @@
   </div>
 </section>
 
-<!-- ============ PACKS À VENIR ============ -->
-<!--
-  CONTENU PROVISOIRE. Les deux offres ci-dessous attendent leurs détails
-  définitifs (périmètre, tarif, date d'ouverture).
-
-  À arbitrer : « Pack Sur-mesure » existe déjà dans la section Packs, où il
-  est commandable. Le même nom ne peut pas être à la fois disponible et
-  « bientôt disponible ». Renommer l'un des deux, retirer l'ancien, ou
-  fusionner.
--->
-<section class="section-avenir" id="a-venir" aria-labelledby="titre-avenir">
+<!-- PACKS:DEBUT — généré par tools/generer-pages-packs.py, ne pas éditer à la main -->
+<section class="section section-packs" id="packs">
+  <span class="blob blob-1" aria-hidden="true"></span>
+  <span class="blob blob-2" aria-hidden="true"></span>
   <div class="wrap">
-    <header class="avenir-head">
-      <p class="eyebrow reveal">Nouvelles offres</p>
-      <h2 id="titre-avenir" class="reveal" data-delay="1">Deux formules arrivent</h2>
+    <header class="sec-head">
+      <p class="eyebrow reveal">Nos packs</p>
+      <h2 class="reveal" data-delay="1">Quatre formules, un cadre clair</h2>
       <p class="sec-sub reveal" data-delay="2">
-        Elles complèteront nos six packs. Laissez-nous vos coordonnées pour être
-        prévenu de leur ouverture, sans engagement.
+        Deux formules ouvertes dès aujourd'hui, deux autres en préparation.
+        Chaque pack fixe un périmètre ; le contenu s'ajuste ensuite à votre lieu,
+        votre date et vos effectifs.
       </p>
     </header>
 
-    <div class="avenir-grille">
-
-      <article class="avenir reveal" data-delay="1">
-        <p class="avenir-badge"><span class="pastille" aria-hidden="true"></span>Bientôt disponible</p>
-        <div class="avenir-scene" aria-hidden="true">
-          <span class="onde"></span><span class="onde"></span><span class="onde"></span>
-          <span class="noyau"></span>
-        </div>
-        <div class="avenir-corps">
+    <div class="packs packs-quatre">
+      <article class="pack pack-dispo reveal" data-delay="1">
+        <p class="pack-badge pack-badge-dispo">Disponible</p>
+        <div class="pack-anim anim-seminaire" aria-hidden="true"><span class="stage"></span><span class="seats"></span><span class="sweep"></span></div>
+        <div class="pack-body">
           <p class="pack-tag">Format court</p>
           <h3>Pack Essentiel</h3>
-          <p class="avenir-desc">
-            Une formule resserrée pour les événements simples : un lieu, une salle équipée,
-            une coordination le jour J. Le détail du périmètre et le tarif arrivent.
-          </p>
-          <button class="btn btn-outline btn-sm js-prevenir" data-offre="Pack Essentiel">
-            Être prévenu du lancement
-          </button>
+          <p class="pack-desc">Une formule resserrée sur ce qui compte : un lieu adapté, une salle équipée, la restauration et quelqu'un qui tient la journée.</p>
+          <ul class="pack-list">
+            <li>Recherche et négociation du lieu</li>
+            <li>Salle équipée et régie légère</li>
+            <li>Restauration et pauses</li>
+            <li>Coordination du jour J</li>
+            <li>Accueil et émargement</li>
+          </ul>
+          <a class="pack-detail" href="packs/essentiel.html">Voir le détail du pack</a>
+          <div class="pack-foot">
+            <p class="price"><small>tarif</small><strong>Sur devis</strong><small>&nbsp;</small></p>
+            <button class="btn btn-primary btn-sm js-devis" data-pack="Pack Essentiel">Demander ce pack</button>
+          </div>
         </div>
       </article>
 
-      <article class="avenir reveal" data-delay="2">
-        <p class="avenir-badge"><span class="pastille" aria-hidden="true"></span>Bientôt disponible</p>
-        <div class="avenir-scene avenir-scene-gem" aria-hidden="true">
-          <span class="facet-gem">
-            <svg viewBox="0 0 100 100">
-              <polygon class="f f1" points="34,28 66,28 78,40 22,40"/>
-              <polygon class="f f2" points="22,40 50,40 50,86"/>
-              <polygon class="f f3" points="50,40 78,40 50,86"/>
-              <path class="outline" d="M34 28 H66 L78 40 L50 86 L22 40 Z"/>
-            </svg>
-          </span>
-          <span class="orbit"></span>
-        </div>
-        <div class="avenir-corps">
+      <article class="pack pack-dispo reveal" data-delay="2">
+        <p class="pack-badge pack-badge-dispo">Disponible</p>
+        <div class="pack-anim anim-mesure" aria-hidden="true"><span class="facet-gem"><svg viewBox="0 0 100 100"><polygon class="f f1" points="34,28 66,28 78,40 22,40"/><polygon class="f f2" points="22,40 50,40 50,86"/><polygon class="f f3" points="50,40 78,40 50,86"/><path class="outline" d="M34 28 H66 L78 40 L50 86 L22 40 Z"/></svg></span><span class="orbit"></span></div>
+        <div class="pack-body">
           <p class="pack-tag">Sans limite de périmètre</p>
           <h3>Pack Sur-mesure</h3>
-          <p class="avenir-desc">
-            Un dispositif construit intégralement autour de votre besoin, sans grille
-            imposée. Le détail du fonctionnement et de la facturation arrivent.
-          </p>
-          <button class="btn btn-outline btn-sm js-prevenir" data-offre="Pack Sur-mesure">
-            Être prévenu du lancement
-          </button>
+          <p class="pack-desc">Un dispositif construit autour de votre besoin, sans grille imposée.</p>
+          <ul class="pack-list">
+            <li>Atelier de cadrage et concept dédié</li>
+            <li>Scénographie et production technique</li>
+            <li>Coordination de tous les prestataires</li>
+            <li>Événements multi-jours, multi-sites, multi-pays</li>
+            <li>Reporting budgétaire et bilan</li>
+          </ul>
+          <a class="pack-detail" href="packs/sur-mesure.html">Voir le détail du pack</a>
+          <div class="pack-foot">
+            <p class="price"><small>tarif</small><strong>Sur devis</strong><small>&nbsp;</small></p>
+            <button class="btn btn-primary btn-sm js-devis" data-pack="Pack Sur-mesure">Demander ce pack</button>
+          </div>
         </div>
       </article>
 
+      <article class="pack pack-attente reveal" data-delay="3">
+        <p class="pack-badge pack-badge-attente">
+          <span class="pastille" aria-hidden="true"></span>En préparation
+        </p>
+        <div class="pack-anim anim-team" aria-hidden="true"><svg class="network" viewBox="0 0 260 130"><g class="net-links"><line x1="52" y1="88" x2="104" y2="44"/><line x1="104" y1="44" x2="156" y2="82"/><line x1="156" y1="82" x2="208" y2="40"/><line x1="52" y1="88" x2="156" y2="82"/><line x1="104" y1="44" x2="208" y2="40"/><line x1="104" y1="44" x2="130" y2="106"/><line x1="130" y1="106" x2="156" y2="82"/></g><g class="net-nodes"><circle cx="52" cy="88" r="5"/><circle cx="104" cy="44" r="5"/><circle cx="156" cy="82" r="5"/><circle cx="208" cy="40" r="5"/><circle cx="130" cy="106" r="5"/></g></svg></div>
+        <div class="pack-body">
+          <p class="pack-tag">En préparation</p>
+          <h3>Troisième formule</h3>
+          <p class="pack-desc">Son nom, son périmètre et son tarif seront annoncés prochainement. Laissez-nous vos coordonnées pour être prévenu de son ouverture.</p>
+          <div class="pack-foot">
+            <p class="price"><small>ouverture</small><strong>Prochainement</strong><small>&nbsp;</small></p>
+            <button class="btn btn-outline btn-sm js-prevenir" data-offre="Troisième formule">
+              Être prévenu
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="pack pack-attente reveal" data-delay="4">
+        <p class="pack-badge pack-badge-attente">
+          <span class="pastille" aria-hidden="true"></span>En préparation
+        </p>
+        <div class="pack-anim anim-lancement" aria-hidden="true"><span class="pulse"></span><span class="pulse"></span><span class="pulse"></span><span class="column"></span><span class="object"></span></div>
+        <div class="pack-body">
+          <p class="pack-tag">En préparation</p>
+          <h3>Quatrième formule</h3>
+          <p class="pack-desc">Son nom, son périmètre et son tarif seront annoncés prochainement. Laissez-nous vos coordonnées pour être prévenu de son ouverture.</p>
+          <div class="pack-foot">
+            <p class="price"><small>ouverture</small><strong>Prochainement</strong><small>&nbsp;</small></p>
+            <button class="btn btn-outline btn-sm js-prevenir" data-offre="Quatrième formule">
+              Être prévenu
+            </button>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 </section>
+<!-- PACKS:FIN -->
 
 <!-- ============ BANDEAU CLIENTS ============ -->
 <section class="clients" aria-label="Ils nous font confiance">
@@ -417,206 +424,6 @@
         <h3>Gestion des participants</h3>
         <p>Site d'inscription, invitations, badges, émargement et reporting de participation en temps réel le jour J.</p>
       </article>
-    </div>
-  </div>
-</section>
-
-<!-- ============ PACKS ============ -->
-<section class="section section-packs" id="packs">
-  <span class="blob blob-1" aria-hidden="true"></span>
-  <span class="blob blob-2" aria-hidden="true"></span>
-  <div class="wrap">
-    <header class="sec-head">
-      <p class="eyebrow reveal">Nos packs</p>
-      <h2 class="reveal" data-delay="1">Six formats, un cadre clair</h2>
-      <p class="sec-sub reveal" data-delay="2">
-        Chaque pack fixe un périmètre et un budget de départ. Le contenu s'ajuste ensuite à votre
-        lieu, votre date et vos effectifs — sans frais de dossier ni surprise en fin de mission.
-      </p>
-    </header>
-
-    <div class="packs">
-
-      <!-- 1. SÉMINAIRE -->
-      <article class="pack reveal" data-delay="1">
-        <div class="pack-anim anim-seminaire" aria-hidden="true">
-          <span class="stage"></span>
-          <span class="seats"></span>
-          <span class="sweep"></span>
-        </div>
-        <div class="pack-body">
-          <p class="pack-tag">30 à 150 collaborateurs</p>
-          <h3>Pack Séminaire</h3>
-          <p class="pack-desc">Journées d'étude, séminaires de direction et séminaires d'équipe, en résidentiel ou à la journée.</p>
-          <ul class="pack-list">
-            <li>Recherche de lieu et négociation du devis</li>
-            <li>Salle plénière équipée et sous-commissions</li>
-            <li>Restauration, pauses et hébergement</li>
-            <li>Animation des ateliers et facilitation</li>
-            <li>Transport groupé aller-retour</li>
-          </ul>
-                    <a class="pack-detail" href="packs/seminaire.html">Voir le détail du pack</a>
-          <div class="pack-foot">
-            <p class="price"><small>à partir de</small><strong>6 900 €</strong><small>HT</small></p>
-            <button class="btn btn-outline btn-sm js-devis" data-pack="Pack Séminaire">Demander ce pack</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 2. CONVENTION (mis en avant) -->
-      <article class="pack featured reveal" data-delay="2">
-        <p class="pack-badge">Le plus demandé</p>
-        <div class="pack-anim anim-convention" aria-hidden="true">
-          <span class="audience"></span>
-          <svg class="arc" viewBox="0 0 260 120" preserveAspectRatio="none">
-            <path class="arc-line" d="M20 96 Q130 26 240 96"/>
-          </svg>
-          <span class="podium"></span>
-        </div>
-        <div class="pack-body">
-          <p class="pack-tag">150 à 2 000 personnes</p>
-          <h3>Pack Convention</h3>
-          <p class="pack-desc">Conventions annuelles, assemblées générales, plénières et conférences clients.</p>
-          <ul class="pack-list">
-            <li>Scénographie de plénière et habillage scénique</li>
-            <li>Régie générale, captation et retransmission</li>
-            <li>Coaching des intervenants et conducteur minuté</li>
-            <li>Traduction simultanée et accessibilité</li>
-            <li>Application participants et interactivité</li>
-          </ul>
-                    <a class="pack-detail" href="packs/convention.html">Voir le détail du pack</a>
-          <div class="pack-foot">
-            <p class="price"><small>à partir de</small><strong>18 000 €</strong><small>HT</small></p>
-            <button class="btn btn-primary btn-sm js-devis" data-pack="Pack Convention">Demander ce pack</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 3. LANCEMENT PRODUIT -->
-      <article class="pack reveal" data-delay="3">
-        <div class="pack-anim anim-lancement" aria-hidden="true">
-          <span class="pulse"></span><span class="pulse"></span><span class="pulse"></span>
-          <span class="column"></span>
-          <span class="object"></span>
-        </div>
-        <div class="pack-body">
-          <p class="pack-tag">Presse, clients, réseau</p>
-          <h3>Pack Lancement produit</h3>
-          <p class="pack-desc">Lancements, inaugurations, roadshows multi-villes et salons professionnels.</p>
-          <ul class="pack-list">
-            <li>Mise en scène produit et parcours de découverte</li>
-            <li>Stand ou showroom éphémère sur mesure</li>
-            <li>Relations presse et gestion des accréditations</li>
-            <li>Contenus vidéo et photo livrés sous 72 h</li>
-            <li>Réplication du dispositif sur plusieurs villes</li>
-          </ul>
-                    <a class="pack-detail" href="packs/lancement-produit.html">Voir le détail du pack</a>
-          <div class="pack-foot">
-            <p class="price"><small>à partir de</small><strong>12 000 €</strong><small>HT</small></p>
-            <button class="btn btn-outline btn-sm js-devis" data-pack="Pack Lancement produit">Demander ce pack</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 4. SOIRÉE DE GALA -->
-      <article class="pack reveal" data-delay="1">
-        <div class="pack-anim anim-gala" aria-hidden="true">
-          <span class="hall"></span>
-          <span class="table"></span>
-          <span class="light-sweep"></span>
-        </div>
-        <div class="pack-body">
-          <p class="pack-tag">Soirées d'entreprise</p>
-          <h3>Pack Soirée de gala</h3>
-          <p class="pack-desc">Dîners de gala, remises de prix, anniversaires d'entreprise et soirées de fin d'année.</p>
-          <ul class="pack-list">
-            <li>Privatisation de lieux d'exception</li>
-            <li>Dîner assis ou cocktail dînatoire signé</li>
-            <li>Cérémonie de remise de prix et trophées</li>
-            <li>Programmation artistique et musicale</li>
-            <li>Vestiaire, accueil VIP et voiturier</li>
-          </ul>
-                    <a class="pack-detail" href="packs/soiree-de-gala.html">Voir le détail du pack</a>
-          <div class="pack-foot">
-            <p class="price"><small>à partir de</small><strong>9 500 €</strong><small>HT</small></p>
-            <button class="btn btn-outline btn-sm js-devis" data-pack="Pack Soirée de gala">Demander ce pack</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 5. TEAM BUILDING -->
-      <article class="pack reveal" data-delay="2">
-        <div class="pack-anim anim-team" aria-hidden="true">
-          <svg class="network" viewBox="0 0 260 130">
-            <g class="net-links">
-              <line x1="52" y1="88" x2="104" y2="44"/>
-              <line x1="104" y1="44" x2="156" y2="82"/>
-              <line x1="156" y1="82" x2="208" y2="40"/>
-              <line x1="52" y1="88" x2="156" y2="82"/>
-              <line x1="104" y1="44" x2="208" y2="40"/>
-              <line x1="104" y1="44" x2="130" y2="106"/>
-              <line x1="130" y1="106" x2="156" y2="82"/>
-            </g>
-            <g class="net-nodes">
-              <circle cx="52" cy="88" r="5"/>
-              <circle cx="104" cy="44" r="5"/>
-              <circle cx="156" cy="82" r="5"/>
-              <circle cx="208" cy="40" r="5"/>
-              <circle cx="130" cy="106" r="5"/>
-            </g>
-          </svg>
-        </div>
-        <div class="pack-body">
-          <p class="pack-tag">Cohésion d'équipe</p>
-          <h3>Pack Team building</h3>
-          <p class="pack-desc">Journées de cohésion, incentives et séminaires d'intégration, en intérieur ou en extérieur.</p>
-          <ul class="pack-list">
-            <li>Atelier de cadrage des objectifs RH</li>
-            <li>Activités adaptées aux effectifs et à la mobilité</li>
-            <li>Animateurs professionnels et matériel fourni</li>
-            <li>Restauration et logistique sur site</li>
-            <li>Bilan de satisfaction post-événement</li>
-          </ul>
-                    <a class="pack-detail" href="packs/team-building.html">Voir le détail du pack</a>
-          <div class="pack-foot">
-            <p class="price"><small>à partir de</small><strong>3 900 €</strong><small>HT</small></p>
-            <button class="btn btn-outline btn-sm js-devis" data-pack="Pack Team building">Demander ce pack</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 6. SUR-MESURE -->
-      <article class="pack reveal" data-delay="3">
-        <div class="pack-anim anim-mesure" aria-hidden="true">
-          <span class="facet-gem">
-            <svg viewBox="0 0 100 100">
-              <polygon class="f f1" points="34,28 66,28 78,40 22,40"/>
-              <polygon class="f f2" points="22,40 50,40 50,86"/>
-              <polygon class="f f3" points="50,40 78,40 50,86"/>
-              <path class="outline" d="M34 28 H66 L78 40 L50 86 L22 40 Z"/>
-            </svg>
-          </span>
-          <span class="orbit"></span>
-        </div>
-        <div class="pack-body">
-          <p class="pack-tag">Dispositifs annuels</p>
-          <h3>Pack Sur-mesure</h3>
-          <p class="pack-desc">Programmes pluriannuels, tournées internationales et formats qui n'entrent dans aucune case.</p>
-          <ul class="pack-list">
-            <li>Accompagnement au forfait ou en régie</li>
-            <li>Événements multi-sites et multi-pays</li>
-            <li>Appels d'offres et marchés publics</li>
-            <li>Charte événementielle et kit de marque</li>
-            <li>Reporting budgétaire et bilan carbone</li>
-          </ul>
-                    <a class="pack-detail" href="packs/sur-mesure.html">Voir le détail du pack</a>
-          <div class="pack-foot">
-            <p class="price"><small>tarif</small><strong>Sur devis</strong><small>&nbsp;</small></p>
-            <button class="btn btn-outline btn-sm js-devis" data-pack="Pack Sur-mesure">Nous consulter</button>
-          </div>
-        </div>
-      </article>
-
     </div>
   </div>
 </section>
@@ -960,11 +767,7 @@
             <label for="f-pack">Type d'événement <span aria-hidden="true">*</span></label>
             <select id="f-pack" name="pack" required aria-describedby="err-f-pack">
               <option value="">— Sélectionnez —</option>
-              <option>Pack Séminaire</option>
-              <option>Pack Convention</option>
-              <option>Pack Lancement produit</option>
-              <option>Pack Soirée de gala</option>
-              <option>Pack Team building</option>
+              <option>Pack Essentiel</option>
               <option>Pack Sur-mesure</option>
               <option>À définir ensemble</option>
             </select>

@@ -10,7 +10,7 @@ via une fonction serverless.
 ```
 index.html               page principale (hero, expertises, packs, réalisations,
                          méthode, engagements, références, FAQ, devis)
-packs/*.html             six pages dédiées, une par pack (générées)
+packs/*.html             page dédiée par pack disponible (générées)
 billetterie.html         vente de billets en ligne
 cgv.html                 conditions générales de vente
 verifier-billet.html     contrôle des billets à l'entrée
@@ -222,6 +222,43 @@ python3 tools/appliquer-meta.py        # canonical, OG, icônes
 node tools/generer-images.mjs          # og-cover.png et favicons
 ```
 
+## Les quatre packs
+
+L'offre compte **quatre packs**, décrits une seule fois dans
+`tools/generer-pages-packs.py` :
+
+| Pack | Statut | Page dédiée | Commandable |
+|---|---|---|---|
+| Pack Essentiel | disponible | oui | oui |
+| Pack Sur-mesure | disponible | oui | oui |
+| Troisième formule | en préparation | non | non |
+| Quatrième formule | en préparation | non | non |
+
+Cette liste fait autorité. `python3 tools/generer-pages-packs.py` régénère à
+partir d'elle : la section de la page d'accueil (entre les marqueurs
+`<!-- PACKS:DEBUT -->` et `<!-- PACKS:FIN -->`), les pages dédiées, le sitemap —
+et **supprime les pages des packs retirés de l'offre**.
+
+Trois endroits restent à aligner à la main si vous ajoutez un pack commandable :
+les options du `<select id="f-pack">` dans `index.html`, la liste `PACKS` de
+`server/devis.js` (qui refuse toute autre valeur), et `SLUGS` dans
+`assets/js/main.js`.
+
+> **À compléter.** Les deux packs en préparation attendent leur nom définitif, et
+> les deux packs disponibles affichent « Sur devis » plutôt qu'un tarif de départ
+> inventé.
+
+## Bandeau d'annonce
+
+Fixé tout en haut de chaque page, avec un compte à rebours. La date se règle dans
+`CONFIG.OUVERTURE` (`assets/js/main.js`), au format `AAAA-MM-JJ` ; vide, le
+bandeau compte deux ans à partir de l'affichage — ce qui n'est pas une vraie
+date, à remplacer dès qu'elle est connue.
+
+Sa hauteur est mesurée puis publiée dans la variable CSS `--annonce-h` : l'en-tête
+fixe, les ancres internes et le hero s'en servent pour se décaler, quel que soit
+le repli du texte sur mobile.
+
 ## Billetterie
 
 Vente de billets en ligne, paiement par **Stripe Checkout** : la page de paiement
@@ -271,6 +308,41 @@ Le quota souffre de la même limite : il est contrôlé juste avant paiement en
 comptant les sessions Stripe déjà payées, mais ce n'est pas une réservation.
 Deux acheteurs simultanés sur la dernière place peuvent tous deux passer — le
 remboursement reste possible.
+
+### Essayer la billetterie
+
+Deux niveaux, du plus rapide au plus complet.
+
+**1. Banc d'essai hors ligne — aucune clé requise**
+
+```bash
+npm run tester-billetterie
+```
+
+Rejoue toute la chaîne avec Stripe et Resend simulés : catalogue, panier,
+paiement, webhook signé, émission, contrôle d'accès. Trente contrôles, dont les
+tentatives qui *doivent* échouer — prix truqué par le navigateur, quantité
+fractionnaire, signature falsifiée ou périmée. Il affiche à la fin un **code de
+billet valide** à coller dans `verifier-billet.html`.
+
+C'est ce banc d'essai qui a déjà attrapé une quantité de `1.5` silencieusement
+ramenée à `1` par `parseInt`.
+
+Il tourne aussi en intégration continue, à chaque push.
+
+**2. Avec le vrai Stripe, en mode test**
+
+1. `STRIPE_SECRET_KEY` = votre clé `sk_test_…`, `SITE_URL` = l'URL du site.
+2. Webhook de test vers `/api/stripe-webhook`, événement
+   `checkout.session.completed` → `STRIPE_WEBHOOK_SECRET`.
+   En local : `stripe listen --forward-to localhost:8888/api/stripe-webhook`.
+3. Réservez sur `billetterie.html` et payez avec la carte de test
+   **4242 4242 4242 4242**, n'importe quelle date future, n'importe quel CVC.
+4. Vous devez recevoir les billets par e-mail, et le code doit être accepté par
+   `verifier-billet.html`.
+
+Aucun euro n'est débité en mode test, et les commandes restent visibles dans le
+tableau de bord Stripe.
 
 ### Mise en service
 
@@ -363,10 +435,10 @@ Tout est en CSS/SVG, en cycles lents de 6 à 9 s, en monochrome rouge.
 4. **Billetterie** : les trois événements de `data/billetterie.json`, leurs dates
    et leurs tarifs sont fictifs. Les conditions de vente doivent être relues par
    un juriste.
-5. **Offres à venir** : le bandeau « Bientôt disponible » sous le hero attend le
-   périmètre et le tarif du Pack Essentiel et du Pack Sur-mesure. À arbitrer :
-   « Pack Sur-mesure » existe déjà et est commandable — le même nom ne peut pas
-   être à la fois disponible et bientôt disponible.
+5. **Packs** : nommer les deux formules en préparation, et fixer un tarif de
+   départ pour l'Essentiel et le Sur-mesure si vous en voulez un affiché.
+6. **Bandeau d'annonce** : renseigner la vraie date d'ouverture dans
+   `CONFIG.OUVERTURE`.
 4. **Réalisations** : les six études de cas et leurs chiffres sont fictifs. Les
    scènes SVG peuvent rester telles quelles, ou céder la place à vos photos
    (prévoir AVIF/WebP, `loading="lazy"` et dimensions explicites).

@@ -15,15 +15,15 @@ RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ── Scènes animées, reprises de la page d'accueil ────────────────────────
 SCENES = {
- "seminaire": ('anim-seminaire', '<span class="stage"></span><span class="seats"></span><span class="sweep"></span>'),
- "convention": ('anim-convention', '<span class="audience"></span>'
-     '<svg class="arc" viewBox="0 0 260 120" preserveAspectRatio="none">'
-     '<path class="arc-line" d="M20 96 Q130 26 240 96"/></svg><span class="podium"></span>'),
- "lancement-produit": ('anim-lancement', '<span class="pulse"></span><span class="pulse"></span>'
-     '<span class="pulse"></span><span class="column"></span><span class="object"></span>'),
- "soiree-de-gala": ('anim-gala', '<span class="hall"></span><span class="table"></span>'
-     '<span class="light-sweep"></span>'),
- "team-building": ('anim-team', '<svg class="network" viewBox="0 0 260 130">'
+ "essentiel": ('anim-seminaire', '<span class="stage"></span><span class="seats"></span>'
+     '<span class="sweep"></span>'),
+ "sur-mesure": ('anim-mesure', '<span class="facet-gem"><svg viewBox="0 0 100 100">'
+     '<polygon class="f f1" points="34,28 66,28 78,40 22,40"/>'
+     '<polygon class="f f2" points="22,40 50,40 50,86"/>'
+     '<polygon class="f f3" points="50,40 78,40 50,86"/>'
+     '<path class="outline" d="M34 28 H66 L78 40 L50 86 L22 40 Z"/></svg></span>'
+     '<span class="orbit"></span>'),
+ "attente": ('anim-team', '<svg class="network" viewBox="0 0 260 130">'
      '<g class="net-links">'
      '<line x1="52" y1="88" x2="104" y2="44"/><line x1="104" y1="44" x2="156" y2="82"/>'
      '<line x1="156" y1="82" x2="208" y2="40"/><line x1="52" y1="88" x2="156" y2="82"/>'
@@ -32,190 +32,101 @@ SCENES = {
      '<circle cx="52" cy="88" r="5"/><circle cx="104" cy="44" r="5"/>'
      '<circle cx="156" cy="82" r="5"/><circle cx="208" cy="40" r="5"/>'
      '<circle cx="130" cy="106" r="5"/></g></svg>'),
- "sur-mesure": ('anim-mesure', '<span class="facet-gem"><svg viewBox="0 0 100 100">'
-     '<polygon class="f f1" points="34,28 66,28 78,40 22,40"/>'
-     '<polygon class="f f2" points="22,40 50,40 50,86"/>'
-     '<polygon class="f f3" points="50,40 78,40 50,86"/>'
-     '<path class="outline" d="M34 28 H66 L78 40 L50 86 L22 40 Z"/></svg></span>'
-     '<span class="orbit"></span>'),
+ "avenir": ('anim-lancement', '<span class="pulse"></span><span class="pulse"></span>'
+     '<span class="pulse"></span><span class="column"></span><span class="object"></span>'),
 }
 
 # ── Contenu des packs ───────────────────────────────────────────────────
+#
+#   L'offre compte QUATRE packs.
+#     · statut "disponible"  → carte + page dédiée + option dans le devis
+#     · statut "preparation" → carte seule, marquée « En préparation »
+#
+#   À COMPLÉTER : les tarifs de départ sont volontairement laissés sur
+#   « Sur devis » plutôt qu'inventés, et les deux packs en préparation
+#   attendent leur nom définitif.
+#
 PACKS = [
 {
- "slug": "seminaire", "nom": "Pack Séminaire", "form": "Pack Séminaire",
- "tag": "30 à 150 collaborateurs", "prix": "6 900 €", "unite": "HT",
- "titre": "Organisation de séminaire d'entreprise",
- "meta": "Organisation de séminaires d'entreprise et journées d'étude, de 30 à 150 collaborateurs. Lieu, technique, restauration, animation et coordination. Devis sous 48 h.",
- "chapo": "Journées d'étude, séminaires de direction et séminaires d'équipe, en résidentiel ou à la journée. Un lieu négocié, une salle équipée, des ateliers animés et une logistique qui ne repose pas sur vos équipes.",
- "pour_qui": ["Directions générales et comités exécutifs", "Services RH organisant un séminaire d'intégration",
-              "Équipes commerciales en lancement de saison", "Directions métiers en séminaire de cadrage"],
+ "slug": "essentiel", "statut": "disponible",
+ "nom": "Pack Essentiel", "form": "Pack Essentiel",
+ "tag": "Format court", "prix": "Sur devis", "unite": "",
+ "titre": "Organisation d'événement d'entreprise, formule essentielle",
+ "meta": "Formule essentielle pour vos événements d'entreprise : lieu, salle équipée, restauration et coordination le jour J. Devis détaillé sous 48 h.",
+ "chapo": "Une formule resserrée sur ce qui compte : un lieu adapté, une salle équipée, la restauration et quelqu'un qui tient la journée. Sans les postes dont vous n'avez pas besoin.",
+ "pour_qui": ["Équipes de 20 à 120 personnes", "Réunions annuelles et journées de travail",
+              "Premières éditions, avant de voir plus grand", "Budgets cadrés à l'avance"],
  "inclus": [
    ("Recherche et négociation du lieu", "Trois lieux présélectionnés selon vos critères, visite organisée, contrat négocié à notre tarif partenaire."),
-   ("Salle plénière et sous-commissions", "Vidéoprojection, sonorisation, micros, paperboards et régie technique sur toute la durée."),
-   ("Restauration, pauses et hébergement", "Petit-déjeuner, pauses, déjeuner et dîner selon le format, chambres bloquées pour le résidentiel."),
-   ("Animation des ateliers et facilitation", "Un facilitateur professionnel, des formats d'atelier adaptés à l'objectif, une restitution écrite."),
-   ("Transport groupé aller-retour", "Autocar ou navettes depuis un point de rendez-vous unique, ou coordination des trajets individuels."),
+   ("Salle équipée et régie légère", "Vidéoprojection, sonorisation, micros et un technicien présent sur toute la durée."),
+   ("Restauration et pauses", "Petit-déjeuner, pauses et déjeuner, choisis avec vous et commandés en votre nom."),
+   ("Coordination du jour J", "Un chef de projet sur place, du montage à la remise en état, avec un conducteur écrit."),
+   ("Accueil et émargement", "Liste des participants, badges si besoin, comptage des présents."),
  ],
- "exclus": ["Les prestations artistiques lourdes — elles relèvent du Pack Soirée de gala",
-            "Les frais de déplacement internationaux des participants"],
- "deroule": [("J-45", "Brief, définition du format et présélection des lieux"),
-             ("J-30", "Visite, contractualisation et lancement des inscriptions"),
-             ("J-7", "Conducteur minuté, brief des intervenants, repérage technique"),
-             ("Jour J", "Régie sur place, accueil des participants, coordination des prestataires")],
- "faq": [("Combien de temps faut-il pour organiser un séminaire ?",
-          "Six semaines suffisent pour un format d'une journée. Comptez huit à dix semaines en résidentiel, la contrainte étant la disponibilité des lieux plus que la production."),
-         ("Peut-on organiser un séminaire hors de la région parisienne ?",
-          "Oui. Nous produisons dans toute la France et en Europe, avec un réseau de lieux et de prestataires référencés dans les principales métropoles."),
-         ("Le tarif de départ comprend-il la restauration ?",
-          "Le tarif de 6 900 € HT couvre la production et la coordination. La restauration et l'hébergement sont chiffrés séparément, au réel, selon le lieu et l'effectif.")],
+ "exclus": ["La scénographie et les décors sur mesure — ils relèvent du Pack Sur-mesure",
+            "Les prestations artistiques et la programmation musicale",
+            "Les dispositifs multi-jours ou multi-sites"],
+ "deroule": [("J-30", "Brief, format retenu et présélection des lieux"),
+             ("J-20", "Visite, contractualisation et budget arrêté"),
+             ("J-5", "Conducteur écrit, commandes passées, effectifs confirmés"),
+             ("Jour J", "Régie sur place, accueil, coordination des prestataires")],
+ "faq": [("En quoi l'Essentiel diffère-t-il du Sur-mesure ?",
+          "L'Essentiel repose sur un périmètre déjà cadré : un lieu, une salle, la restauration, la coordination. Le Sur-mesure part d'une page blanche et n'a pas de limite de périmètre. Si votre besoin entre dans les cases, l'Essentiel coûte moins cher et se monte plus vite."),
+         ("Quel délai faut-il prévoir ?",
+          "Quatre à six semaines suffisent dans la plupart des cas. La contrainte vient presque toujours de la disponibilité des lieux, rarement de la production."),
+         ("Pourquoi le tarif est-il « sur devis » ?",
+          "Parce que le lieu et la restauration pèsent l'essentiel du budget et varient du simple au triple selon la ville, la date et l'effectif. Nous chiffrons poste par poste sous 48 h ouvrées, sans engagement.")],
  "cas": ("seminaire", "Trois jours de cadrage stratégique", "Séminaire résidentiel du comité exécutif : lieu privatisé, ateliers facilités et restitution filmée le dernier jour."),
 },
 {
- "slug": "convention", "nom": "Pack Convention", "form": "Pack Convention",
- "tag": "150 à 2 000 personnes", "prix": "18 000 €", "unite": "HT",
- "titre": "Organisation de convention d'entreprise",
- "meta": "Organisation de conventions annuelles, assemblées générales et conférences clients, de 150 à 2 000 personnes. Scénographie, régie générale, captation. Devis sous 48 h.",
- "chapo": "Conventions annuelles, assemblées générales, plénières et conférences clients. Le format le plus exigeant : une scène, un conducteur à la minute, des intervenants préparés et une salle qui suit.",
- "pour_qui": ["Groupes réunissant leurs collaborateurs une fois par an", "Sociétés cotées tenant leur assemblée générale",
-              "Éditeurs et industriels organisant leur conférence clients", "Fédérations et organisations professionnelles"],
+ "slug": "sur-mesure", "statut": "disponible",
+ "nom": "Pack Sur-mesure", "form": "Pack Sur-mesure",
+ "tag": "Sans limite de périmètre", "prix": "Sur devis", "unite": "",
+ "titre": "Événements sur-mesure et dispositifs annuels",
+ "meta": "Événements construits intégralement sur mesure : conventions, lancements, galas, dispositifs multi-sites et programmes annuels. Devis détaillé sous 48 h.",
+ "chapo": "Un dispositif construit autour de votre besoin, sans grille imposée. Conventions, lancements, galas, tournées, programmes annuels : quand le projet ne rentre dans aucune case, on construit la case.",
+ "pour_qui": ["Conventions et plénières de plus de 150 personnes", "Lancements produit et roadshows multi-villes",
+              "Soirées de gala et remises de prix", "Groupes confiant leur programme événementiel annuel"],
  "inclus": [
-   ("Scénographie de plénière et habillage scénique", "Scène, décor, écrans, mise en lumière et déclinaison de votre identité sur l'ensemble des supports."),
-   ("Régie générale, captation et retransmission", "Régisseur général, équipes son, lumière et vidéo, captation multicaméra et diffusion en direct si besoin."),
-   ("Coaching des intervenants et conducteur minuté", "Répétitions, réécriture des prises de parole, prompteur et conducteur partagé en temps réel."),
-   ("Traduction simultanée et accessibilité", "Cabines d'interprétation, casques, sous-titrage en direct et places réservées."),
-   ("Application participants et interactivité", "Programme, plan, questions du public, votes en direct et export des résultats."),
- ],
- "exclus": ["La production de contenus vidéo longs, chiffrée à part",
-            "Les frais de déplacement et d'hébergement des participants"],
- "deroule": [("J-120", "Cadrage, choix du lieu et budget prévisionnel détaillé"),
-             ("J-60", "Scénographie validée, prestataires contractualisés, ouverture des inscriptions"),
-             ("J-15", "Répétitions intervenants, conducteur figé, plan de prévention déposé"),
-             ("Jour J", "Montage la veille, régie générale, démontage et bilan à chaud")],
- "faq": [("À partir de combien de participants parle-t-on de convention ?",
-          "En pratique, au-delà de 150 personnes le dispositif change de nature : il faut une régie générale, un conducteur minuté et une logistique d'accueil. C'est là que ce pack commence."),
-         ("Assurez-vous la retransmission en direct ?",
-          "Oui, en captation multicaméra avec diffusion sur votre intranet ou une plateforme dédiée, et enregistrement livré après l'événement."),
-         ("Quel délai pour une convention de 500 personnes ?",
-          "Trois à quatre mois dans des conditions normales. Nous avons déjà monté des conventions de cette taille en six semaines, avec un choix de lieux restreint.")],
- "cas": ("convention", "Réunir 850 collaborateurs sur deux jours", "Convention plénière et ateliers pour un groupe industriel, montée en six semaines après un changement de lieu de dernière minute."),
-},
-{
- "slug": "lancement-produit", "nom": "Pack Lancement produit", "form": "Pack Lancement produit",
- "tag": "Presse, clients, réseau", "prix": "12 000 €", "unite": "HT",
- "titre": "Organisation de lancement produit et roadshow",
- "meta": "Organisation de lancements produit, inaugurations et roadshows multi-villes. Mise en scène, relations presse, contenus livrés sous 72 h. Devis sous 48 h.",
- "chapo": "Lancements, inaugurations, roadshows multi-villes et salons professionnels. Un dispositif pensé pour que le produit soit vu, compris et repris.",
- "pour_qui": ["Directions marketing lançant une gamme", "Industriels inaugurant un site",
-              "Éditeurs en tournée commerciale", "Marques exposant sur un salon professionnel"],
- "inclus": [
-   ("Mise en scène produit et parcours de découverte", "Réveil produit, éclairage dédié, parcours guidé et démonstrations cadencées."),
-   ("Stand ou showroom éphémère sur mesure", "Conception, fabrication, montage et démontage, stockage entre deux étapes."),
-   ("Relations presse et gestion des accréditations", "Fichier presse, invitations, accréditations, espace dédié et accompagnement sur place."),
-   ("Contenus vidéo et photo livrés sous 72 h", "Photographe et vidéaste sur place, sélection retouchée et aftermovie court."),
-   ("Réplication du dispositif sur plusieurs villes", "Même scénographie, équipes locales, logistique centralisée et calendrier unique."),
+   ("Atelier de cadrage et concept dédié", "Objectifs, message, format et parcours participant, arrêtés avec vous avant tout chiffrage."),
+   ("Scénographie et production technique", "Scène, décor, son, lumière, vidéo, captation : conception, fabrication et régie générale."),
+   ("Coordination de tous les prestataires", "Lieux, traiteurs, artistes, sécurité, transport, hébergement, sous un seul contrat."),
+   ("Événements multi-jours, multi-sites, multi-pays", "Coordination centralisée, partenaires locaux, conformité réglementaire par pays."),
+   ("Reporting budgétaire et bilan", "Suivi consolidé des dépenses, rapport de satisfaction et bilan carbone."),
  ],
  "exclus": ["L'achat d'espace publicitaire et le média payant",
-            "La production du produit lui-même et de ses packagings"],
- "deroule": [("J-60", "Concept, message et sélection des lieux ou du salon"),
-             ("J-30", "Fabrication de la scénographie, envoi des invitations presse"),
-             ("J-7", "Montage à blanc, répétition des démonstrations"),
-             ("Jour J", "Accueil, régie, captation, puis livraison des contenus sous 72 h")],
- "faq": [("Gérez-vous les relations presse ?",
-          "Nous gérons les accréditations, l'accueil et l'espace presse le jour J. La stratégie de relations presse au long cours relève de votre agence RP, avec qui nous travaillons volontiers."),
-         ("Peut-on répliquer le dispositif dans plusieurs villes ?",
-          "C'est précisément l'objet du format roadshow : une scénographie transportable, des équipes locales et une logistique centralisée. Le coût par ville décroît fortement après la première."),
-         ("Sous quel délai récupère-t-on les photos et vidéos ?",
-          "Une sélection retouchée sous 72 h, l'aftermovie monté sous une semaine.")],
- "cas": ("lancement", "Une révélation devant presse et réseau", "Mise en scène produit, parcours de découverte et gestion des accréditations pour un lancement européen."),
-},
-{
- "slug": "soiree-de-gala", "nom": "Pack Soirée de gala", "form": "Pack Soirée de gala",
- "tag": "Soirées d'entreprise", "prix": "9 500 €", "unite": "HT",
- "titre": "Organisation de soirée de gala et remise de prix",
- "meta": "Organisation de dîners de gala, remises de prix et soirées de fin d'année. Lieu d'exception, dîner signé, programmation artistique. Devis sous 48 h.",
- "chapo": "Dîners de gala, remises de prix, anniversaires d'entreprise et soirées de fin d'année. Le moment où la forme compte autant que le fond.",
- "pour_qui": ["Entreprises fêtant un anniversaire ou un cap", "Groupes organisant leur soirée de fin d'année",
-              "Fédérations remettant des trophées", "Directions commerciales célébrant leurs résultats"],
- "inclus": [
-   ("Privatisation de lieux d'exception", "Hôtels particuliers, monuments, rooftops : négociation, contrat et autorisations administratives."),
-   ("Dîner assis ou cocktail dînatoire signé", "Sélection du traiteur, dégustation préalable, service en salle et accords mets-vins."),
-   ("Cérémonie de remise de prix et trophées", "Écriture du déroulé, régie de la cérémonie, fabrication des trophées, prompteur."),
-   ("Programmation artistique et musicale", "Booking, contrats et déclarations, régie artistique et loges."),
-   ("Vestiaire, accueil VIP et voiturier", "Personnel d'accueil, plan de table, gestion des invités prioritaires et sécurité."),
- ],
- "exclus": ["Les cadeaux et dotations remis aux invités",
-            "Les nuitées d'hôtel des convives"],
- "deroule": [("J-90", "Repérage des lieux, définition de l'ambiance et du déroulé"),
-             ("J-45", "Traiteur retenu après dégustation, artistes contractualisés"),
-             ("J-10", "Plan de table figé, brief du personnel, répétition de la cérémonie"),
-             ("Jour J", "Montage, accueil, régie de soirée, démontage de nuit")],
- "faq": [("Prenez-vous en charge les autorisations et la sécurité ?",
-          "Oui : autorisations d'occupation, déclarations SACEM, agents de sécurité et plan de prévention font partie de la mission."),
-         ("Jusqu'à quelle heure peut-on prolonger la soirée ?",
-          "Cela dépend du lieu et de son arrêté d'exploitation. Nous vérifions ce point avant même de vous proposer une adresse."),
-         ("Peut-on organiser une remise de prix sans dîner ?",
-          "Oui, en format cocktail ou cérémonie seule. Le tarif de départ s'ajuste à la baisse en conséquence.")],
- "cas": ("gala", "Remise de prix et dîner assis", "Privatisation d'un lieu patrimonial, cérémonie de remise de trophées et programmation artistique jusqu'à 2 h."),
-},
-{
- "slug": "team-building", "nom": "Pack Team building", "form": "Pack Team building",
- "tag": "Cohésion d'équipe", "prix": "3 900 €", "unite": "HT",
- "titre": "Organisation de team building et journée de cohésion",
- "meta": "Organisation de team building, journées de cohésion et incentives. Cadrage RH, activités adaptées, animateurs professionnels. Devis sous 48 h.",
- "chapo": "Journées de cohésion, incentives et séminaires d'intégration, en intérieur ou en extérieur. Une journée conçue à partir d'un objectif RH, pas d'un catalogue d'activités.",
- "pour_qui": ["Équipes après une fusion ou une réorganisation", "Services accueillant plusieurs arrivées",
-              "Équipes distantes se réunissant physiquement", "Directions souhaitant récompenser un résultat"],
- "inclus": [
-   ("Atelier de cadrage des objectifs RH", "Un échange préalable pour définir ce que la journée doit produire, et comment on le mesurera."),
-   ("Activités adaptées aux effectifs et à la mobilité", "Aucune activité excluante : chaque format est vérifié sur la condition physique et l'accessibilité."),
-   ("Animateurs professionnels et matériel fourni", "Encadrement diplômé, assurance, matériel livré et repris sur site."),
-   ("Restauration et logistique sur site", "Déjeuner, pauses, sanitaires, plan B météo pour tout format extérieur."),
-   ("Bilan de satisfaction post-événement", "Questionnaire à chaud, synthèse chiffrée et recommandations pour la prochaine édition."),
- ],
- "exclus": ["Les séjours de plusieurs nuits — voir le Pack Séminaire",
-            "Les activités à risque nécessitant une qualification individuelle"],
- "deroule": [("J-30", "Cadrage RH, choix du format et du lieu"),
-             ("J-15", "Réservation, plan B météo, communication interne"),
-             ("J-2", "Confirmation des effectifs, brief des animateurs"),
-             ("Jour J", "Encadrement, logistique, questionnaire de satisfaction à chaud")],
- "faq": [("Comment éviter les activités qui excluent une partie de l'équipe ?",
-          "C'est l'objet du cadrage préalable. Nous écartons systématiquement les formats reposant sur la performance physique ou la mise en avant individuelle si l'objectif est la cohésion."),
-         ("Que se passe-t-il en cas de mauvais temps ?",
-          "Tout format extérieur est réservé avec un plan B intérieur, décidé la veille et sans surcoût."),
-         ("Le team building peut-il s'intégrer à un séminaire ?",
-          "Oui, et c'est fréquent : une demi-journée de cohésion insérée dans un séminaire de deux jours. Le devis est alors global.")],
- "cas": ("team-building", "Deux cents personnes, une seule équipe", "Journée de cohésion en extérieur après une fusion : ateliers par équipes mixtes et bilan de satisfaction à chaud."),
-},
-{
- "slug": "sur-mesure", "nom": "Pack Sur-mesure", "form": "Pack Sur-mesure",
- "tag": "Dispositifs annuels", "prix": "Sur devis", "unite": "",
- "titre": "Événements sur-mesure et dispositifs annuels",
- "meta": "Programmes événementiels pluriannuels, tournées internationales, marchés publics et formats hors catalogue. Accompagnement au forfait ou en régie. Devis sous 48 h.",
- "chapo": "Programmes pluriannuels, tournées internationales et formats qui n'entrent dans aucune case. Quand le besoin ne ressemble à aucun pack, on construit le pack.",
- "pour_qui": ["Groupes confiant leur programme événementiel annuel", "Organisations opérant sur plusieurs pays",
-              "Acheteurs publics passant par appel d'offres", "Directions cherchant un accompagnement en régie"],
- "inclus": [
-   ("Accompagnement au forfait ou en régie", "Un budget annuel et une équipe dédiée, ou une facturation à la mission selon votre mode de fonctionnement."),
-   ("Événements multi-sites et multi-pays", "Coordination centralisée, partenaires locaux, conformité réglementaire par pays."),
-   ("Appels d'offres et marchés publics", "Dossier administratif complet, mémoire technique, respect des délais de la consultation."),
-   ("Charte événementielle et kit de marque", "Un référentiel réutilisable par vos équipes et vos autres prestataires."),
-   ("Reporting budgétaire et bilan carbone", "Suivi consolidé des dépenses et estimation de l'empreinte de chaque événement."),
- ],
- "exclus": [],
- "deroule": [("Semaine 1", "Atelier de cadrage et audit de l'existant"),
-             ("Semaine 3", "Proposition de dispositif, budget-cadre et gouvernance"),
-             ("Continu", "Production des événements du programme, points d'avancement mensuels"),
-             ("Annuel", "Bilan consolidé, reporting budgétaire et carbone, plan de l'année suivante")],
+            "Les frais de déplacement et d'hébergement des participants"],
+ "deroule": [("J-120", "Atelier de cadrage, concept et budget prévisionnel"),
+             ("J-60", "Scénographie validée, prestataires contractualisés"),
+             ("J-15", "Répétitions, conducteur figé, plan de prévention déposé"),
+             ("Jour J", "Montage, régie générale, démontage, puis bilan sous 7 jours")],
  "faq": [("Travaillez-vous en marchés publics ?",
           "Oui. Nous fournissons l'ensemble des pièces administratives — attestations URSSAF, RC Pro, références — et répondons aux consultations publiques comme privées."),
-         ("Peut-on vous confier seulement une partie de l'événement ?",
+         ("Peut-on ne vous confier qu'une partie de l'événement ?",
           "Oui. Nous intervenons aussi en régie seule, en production technique ou en conseil, en complément d'une équipe interne déjà en place."),
          ("Comment est facturé un accompagnement annuel ?",
           "Soit au forfait, avec une enveloppe et un périmètre définis à l'année, soit à la mission. Le mode est arrêté au cadrage, jamais en cours de route.")],
- "cas": ("roadshow", "Sept villes en trois semaines", "Dispositif répliqué à l'identique dans sept métropoles, avec équipes locales et logistique centralisée."),
+ "cas": ("convention", "Réunir 850 collaborateurs sur deux jours", "Convention plénière et ateliers pour un groupe industriel, montée en six semaines après un changement de lieu de dernière minute."),
+},
+{
+ "slug": "formule-3", "statut": "preparation",
+ "nom": "Troisième formule", "form": None,
+ "tag": "En préparation", "prix": "", "unite": "",
+ "titre": "", "meta": "", "chapo": "",
+ "desc": "Son nom, son périmètre et son tarif seront annoncés prochainement. Laissez-nous vos coordonnées pour être prévenu de son ouverture.",
+ "scene": "attente",
+},
+{
+ "slug": "formule-4", "statut": "preparation",
+ "nom": "Quatrième formule", "form": None,
+ "tag": "En préparation", "prix": "", "unite": "",
+ "titre": "", "meta": "", "chapo": "",
+ "desc": "Son nom, son périmètre et son tarif seront annoncés prochainement. Laissez-nous vos coordonnées pour être prévenu de son ouverture.",
+ "scene": "avenir",
 },
 ]
+
+DISPONIBLES = [p for p in PACKS if p["statut"] == "disponible"]
 
 LOGO = ('<svg viewBox="0 0 100 100" class="gem-svg">'
  '<defs><linearGradient id="gTop" x1="0" y1="0" x2="1" y2="1">'
@@ -302,7 +213,7 @@ def page(p, autres):
 
     liens_autres = "\n".join(
         f'          <a href="{a["slug"]}.html">{a["nom"]}</a>'
-        for a in autres if a["slug"] != p["slug"])
+        for a in DISPONIBLES if a["slug"] != p["slug"])
 
     cas_img, cas_titre, cas_texte = p["cas"]
 
@@ -476,19 +387,111 @@ def page(p, autres):
 '''
 
 
+def carte(p):
+    """Carte d'un pack pour la page d'accueil."""
+    if p["statut"] == "disponible":
+        cls, inner = SCENES[p["slug"]]
+        listes = "\n".join(f"            <li>{t}</li>" for t, _ in p["inclus"])
+        return f"""      <article class="pack pack-dispo reveal" data-delay="{{delai}}">
+        <p class="pack-badge pack-badge-dispo">Disponible</p>
+        <div class="pack-anim {cls}" aria-hidden="true">{inner}</div>
+        <div class="pack-body">
+          <p class="pack-tag">{p["tag"]}</p>
+          <h3>{p["nom"]}</h3>
+          <p class="pack-desc">{p["chapo"].split(".")[0]}.</p>
+          <ul class="pack-list">
+{listes}
+          </ul>
+          <a class="pack-detail" href="packs/{p["slug"]}.html">Voir le détail du pack</a>
+          <div class="pack-foot">
+            <p class="price"><small>tarif</small><strong>Sur devis</strong><small>&nbsp;</small></p>
+            <button class="btn btn-primary btn-sm js-devis" data-pack="{p["nom"]}">Demander ce pack</button>
+          </div>
+        </div>
+      </article>"""
+
+    cls, inner = SCENES[p["scene"]]
+    return f"""      <article class="pack pack-attente reveal" data-delay="{{delai}}">
+        <p class="pack-badge pack-badge-attente">
+          <span class="pastille" aria-hidden="true"></span>En préparation
+        </p>
+        <div class="pack-anim {cls}" aria-hidden="true">{inner}</div>
+        <div class="pack-body">
+          <p class="pack-tag">{p["tag"]}</p>
+          <h3>{p["nom"]}</h3>
+          <p class="pack-desc">{p["desc"]}</p>
+          <div class="pack-foot">
+            <p class="price"><small>ouverture</small><strong>Prochainement</strong><small>&nbsp;</small></p>
+            <button class="btn btn-outline btn-sm js-prevenir" data-offre="{p["nom"]}">
+              Être prévenu
+            </button>
+          </div>
+        </div>
+      </article>"""
+
+
+def section_packs():
+    """Bloc inséré dans index.html entre les marqueurs PACKS."""
+    cartes = "\n\n".join(
+        carte(p).replace("{delai}", str(i % 4 + 1)) for i, p in enumerate(PACKS))
+    return f"""<!-- PACKS:DEBUT — généré par tools/generer-pages-packs.py, ne pas éditer à la main -->
+<section class="section section-packs" id="packs">
+  <span class="blob blob-1" aria-hidden="true"></span>
+  <span class="blob blob-2" aria-hidden="true"></span>
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow reveal">Nos packs</p>
+      <h2 class="reveal" data-delay="1">Quatre formules, un cadre clair</h2>
+      <p class="sec-sub reveal" data-delay="2">
+        Deux formules ouvertes dès aujourd'hui, deux autres en préparation.
+        Chaque pack fixe un périmètre ; le contenu s'ajuste ensuite à votre lieu,
+        votre date et vos effectifs.
+      </p>
+    </header>
+
+    <div class="packs packs-quatre">
+{cartes}
+    </div>
+  </div>
+</section>
+<!-- PACKS:FIN -->"""
+
+
 def main():
     dossier = os.path.join(RACINE, "packs")
     os.makedirs(dossier, exist_ok=True)
-    for p in PACKS:
+
+    # Les pages des packs retirés de l'offre ne doivent pas survivre.
+    attendus = {p["slug"] + ".html" for p in DISPONIBLES}
+    for fichier in sorted(os.listdir(dossier)):
+        if fichier.endswith(".html") and fichier not in attendus:
+            os.remove(os.path.join(dossier, fichier))
+            print(f"supprimé : packs/{fichier}")
+
+    for p in DISPONIBLES:
         chemin = os.path.join(dossier, p["slug"] + ".html")
         with open(chemin, "w", encoding="utf-8") as f:
             f.write(page(p, PACKS))
         print(f"packs/{p['slug']}.html".ljust(34), f"{os.path.getsize(chemin)/1024:.1f} Ko")
 
+    # ── section packs de la page d'accueil ──────────────────────────────
+    accueil = os.path.join(RACINE, "index.html")
+    with open(accueil, encoding="utf-8") as f:
+        html = f.read()
+    debut, fin = "<!-- PACKS:DEBUT", "<!-- PACKS:FIN -->"
+    if debut in html and fin in html:
+        avant = html[:html.index(debut)]
+        apres = html[html.index(fin) + len(fin):]
+        with open(accueil, "w", encoding="utf-8") as f:
+            f.write(avant + section_packs() + apres)
+        print("index.html".ljust(34), "section packs régénérée")
+    else:
+        print("index.html".ljust(34), "MARQUEURS PACKS ABSENTS — section non régénérée")
+
     # ── sitemap ─────────────────────────────────────────────────────────
     aujourd_hui = datetime.date.today().isoformat()
     urls = [(SITE + "/", "1.0", "weekly")]
-    urls += [(f"{SITE}/packs/{p['slug']}.html", "0.8", "monthly") for p in PACKS]
+    urls += [(f"{SITE}/packs/{p['slug']}.html", "0.8", "monthly") for p in DISPONIBLES]
     urls += [(f"{SITE}/billetterie.html", "0.9", "daily"),
              (f"{SITE}/cgv.html", "0.2", "yearly"),
              (f"{SITE}/mentions-legales.html", "0.2", "yearly"),

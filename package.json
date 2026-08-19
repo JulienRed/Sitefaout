@@ -10,7 +10,8 @@
   "scripts": {
     "audit": "node tools/audit.mjs",
     "generer": "python3 tools/generer-pages-packs.py && python3 tools/appliquer-meta.py",
-    "images": "node tools/generer-images.mjs"
+    "images": "node tools/generer-images.mjs",
+    "tester-billetterie": "node tools/tester-billetterie.mjs"
   },
   "devDependencies": {
     "playwright": "^1.56.1"

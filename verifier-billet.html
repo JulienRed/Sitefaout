@@ -16,13 +16,21 @@
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 
 <!-- ============ BANDEAU D'ANNONCE ============ -->
-<div class="annonce-haut" id="annonceHaut" role="region" aria-label="Annonce">
+<div class="annonce-haut" id="annonceHaut" role="region" aria-label="Ouverture de l'entreprise">
   <div class="wrap annonce-inner">
     <span class="annonce-pastille" aria-hidden="true"></span>
-    <p class="annonce-texte">
-      <strong>Ouverture dans deux ans</strong>
-      <span class="annonce-compte" id="annonceCompte"></span>
+    <p class="annonce-texte"><strong>Ouverture de l'entreprise</strong></p>
+
+    <!-- Le décompte bat à la seconde : le faire annoncer par un lecteur
+         d'écran serait insupportable. Il est donc masqué à l'assistance,
+         qui reçoit la date en clair juste après. -->
+    <p class="compte-rebours" id="compteRebours" aria-hidden="true">
+      <span class="cr-bloc"><b data-unite="jours">—</b><i>j</i></span>
+      <span class="cr-bloc"><b data-unite="heures">—</b><i>h</i></span>
+      <span class="cr-bloc"><b data-unite="minutes">—</b><i>min</i></span>
+      <span class="cr-bloc cr-secondes"><b data-unite="secondes">—</b><i>s</i></span>
     </p>
+    <span class="sr-only" id="compteTexte"></span>
   </div>
 </div>
 

@@ -46,11 +46,12 @@
     ANALYTICS_DOMAIN:  '',
     RDV_URL:           '',
 
-    /* Date d'ouverture annoncée par le bandeau du haut.
-       Vide = deux ans après le premier affichage, ce qui n'est pas une
-       vraie date : renseignez-la dès qu'elle est connue, au format
-       'AAAA-MM-JJ'. */
-    OUVERTURE:         ''
+    /* Date d'ouverture visée par le compte à rebours du bandeau, au format
+       'AAAA-MM-JJ' ou 'AAAA-MM-JJTHH:MM'.
+
+       DATE PROVISOIRE — à remplacer par la vraie. Elle doit être fixe :
+       un décompte recalculé à chaque visite ne décroîtrait jamais. */
+    OUVERTURE:         '2028-09-01T09:00'
   };
 
   /* ---------------------------------------------------------
@@ -86,6 +87,9 @@
     var barre = $('#annonceHaut');
     if (!barre) return;
 
+    /* La hauteur du bandeau est publiée en variable CSS : l'en-tête fixe et
+       les ancres internes s'en servent pour se décaler. Elle change quand le
+       texte se replie, d'où l'observation continue. */
     function mesurer() {
       document.documentElement.style.setProperty(
         '--annonce-h', barre.offsetHeight + 'px');
@@ -94,33 +98,82 @@
     window.addEventListener('resize', mesurer);
     if (window.ResizeObserver) new ResizeObserver(mesurer).observe(barre);
 
-    var compte = $('#annonceCompte');
-    if (!compte) return;
+    var bloc = $('#compteRebours');
+    if (!bloc) return;
 
-    var cible = CONFIG.OUVERTURE ? new Date(CONFIG.OUVERTURE + 'T00:00:00') : null;
-    if (!cible || isNaN(cible)) {
-      cible = new Date();
-      cible.setFullYear(cible.getFullYear() + 2);
+    var cible = new Date(CONFIG.OUVERTURE);
+    if (isNaN(cible)) { bloc.remove(); return; }
+
+    /* Date en clair pour les lecteurs d'écran : le décompte lui-même est
+       masqué, l'annoncer à chaque seconde serait inutilisable. */
+    var texte = $('#compteTexte');
+    if (texte) {
+      /* En français le premier du mois s'écrit « 1er », pas « 1 ». */
+      var jour = cible.getDate();
+      texte.textContent = 'Ouverture prévue le ' + (jour === 1 ? '1er' : jour) + ' ' +
+        cible.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) + '.';
     }
 
-    function restant() {
-      var jours = Math.ceil((cible - Date.now()) / 86400000);
-      if (jours <= 0) { compte.textContent = ''; return; }
-      if (jours > 60) {
-        var mois = Math.round(jours / 30.44);
-        if (mois >= 12) {
-          var ans = Math.floor(mois / 12), reste = mois % 12;
-          compte.textContent = '· dans ' + ans + (ans > 1 ? ' ans' : ' an') +
-            (reste ? ' et ' + reste + ' mois' : '');
-        } else {
-          compte.textContent = '· dans ' + mois + ' mois';
-        }
-      } else {
-        compte.textContent = '· dans ' + jours + ' jour' + (jours > 1 ? 's' : '');
-      }
+    var champs = {};
+    $$('b[data-unite]', bloc).forEach(function (el) {
+      champs[el.getAttribute('data-unite')] = el;
+    });
+
+    function poser(unite, valeur, largeur) {
+      var el = champs[unite];
+      if (!el) return;
+      var rendu = String(valeur).padStart(largeur, '0');
+      if (el.textContent !== rendu) el.textContent = rendu;
     }
-    restant();
-    window.setInterval(restant, 3600000);
+
+    function ouvert() {
+      bloc.remove();
+      var libelle = $('.annonce-texte strong', barre);
+      if (libelle) libelle.textContent = 'L’entreprise est ouverte';
+      barre.classList.add('annonce-ouvert');
+      if (texte) texte.textContent = '';
+      mesurer();
+    }
+
+    function battre() {
+      var reste = cible.getTime() - Date.now();
+      if (reste <= 0) { ouvert(); return false; }
+
+      var secondes = Math.floor(reste / 1000);
+      poser('jours', Math.floor(secondes / 86400), 1);
+      poser('heures', Math.floor(secondes / 3600) % 24, 2);
+      poser('minutes', Math.floor(secondes / 60) % 60, 2);
+      poser('secondes', secondes % 60, 2);
+      return true;
+    }
+
+    /* Mouvement réduit : on garde le décompte mais on cesse de faire
+       clignoter les secondes, et on ne rafraîchit qu'à la minute. */
+    var periode = reduceMotion ? 60000 : 1000;
+    if (reduceMotion) {
+      var sec = bloc.querySelector('.cr-secondes');
+      if (sec) sec.remove();
+    }
+
+    var minuteur = null;
+    function demarrer() {
+      if (minuteur) return;
+      if (battre()) minuteur = window.setInterval(function () {
+        if (!battre()) { window.clearInterval(minuteur); minuteur = null; }
+      }, periode);
+    }
+    function arreter() {
+      if (minuteur) { window.clearInterval(minuteur); minuteur = null; }
+    }
+
+    /* Inutile de compter dans un onglet que personne ne regarde. */
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') arreter();
+      else { battre(); demarrer(); }
+    });
+
+    demarrer();
+    mesurer();
   }());
 
   /* =========================================================

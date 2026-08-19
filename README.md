@@ -250,10 +250,30 @@ les options du `<select id="f-pack">` dans `index.html`, la liste `PACKS` de
 
 ## Bandeau d'annonce
 
-Fixé tout en haut de chaque page, avec un compte à rebours. La date se règle dans
-`CONFIG.OUVERTURE` (`assets/js/main.js`), au format `AAAA-MM-JJ` ; vide, le
-bandeau compte deux ans à partir de l'affichage — ce qui n'est pas une vraie
-date, à remplacer dès qu'elle est connue.
+Fixé tout en haut de chaque page, avec un **compte à rebours à la seconde**
+jusqu'à l'ouverture : jours, heures, minutes, secondes.
+
+La date se règle dans `CONFIG.OUVERTURE` (`assets/js/main.js`), au format
+`AAAA-MM-JJ` ou `AAAA-MM-JJTHH:MM`. Elle doit être **fixe** : une échéance
+recalculée à chaque visite ne décroîtrait jamais.
+
+> **Date provisoire.** `2028-09-01T09:00` est un repère à deux ans, pas une vraie
+> date d'ouverture. À remplacer.
+
+Quelques partis pris :
+
+- **Les chiffres ont une largeur figée** (`min-width: 2ch`, chiffres tabulaires) :
+  sans cela, le passage de `10` à `9` décale ses voisins et le bandeau tressaute
+  une fois par seconde.
+- **Le décompte est masqué aux lecteurs d'écran** (`aria-hidden`), qui reçoivent
+  la date en clair juste à côté. Faire annoncer un compteur chaque seconde rendrait
+  la page inutilisable.
+- **`prefers-reduced-motion`** retire les secondes et passe le rafraîchissement à
+  la minute.
+- Le décompte **s'arrête dans un onglet masqué**, et sous 420 px les secondes
+  disparaissent pour ne pas imposer une seconde ligne.
+- À échéance, le décompte disparaît et le libellé devient « L'entreprise est
+  ouverte ».
 
 Sa hauteur est mesurée puis publiée dans la variable CSS `--annonce-h` : l'en-tête
 fixe, les ancres internes et le hero s'en servent pour se décaler, quel que soit
@@ -438,8 +458,8 @@ Tout est en CSS/SVG, en cycles lents de 6 à 9 s, en monochrome rouge.
 5. **Packs** : définir le périmètre du Pack Premium et du Pack Prestige, et fixer
    un tarif de départ pour l'Essentiel et le Sur-mesure si vous en voulez un
    affiché.
-6. **Bandeau d'annonce** : renseigner la vraie date d'ouverture dans
-   `CONFIG.OUVERTURE`.
+6. **Bandeau d'annonce** : remplacer la date provisoire `2028-09-01T09:00` par
+   la vraie date d'ouverture dans `CONFIG.OUVERTURE`.
 4. **Réalisations** : les six études de cas et leurs chiffres sont fictifs. Les
    scènes SVG peuvent rester telles quelles, ou céder la place à vos photos
    (prévoir AVIF/WebP, `loading="lazy"` et dimensions explicites).

@@ -1557,13 +1557,28 @@ p{ margin:0 0 1rem; }
   box-shadow:0 0 0 0 rgba(255,255,255,.7); animation:pastilleBat 2.6s ease-out infinite;
 }
 .annonce-texte{
-  margin:0; display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;
-  justify-content:center; text-align:center;
-  font-size:.85rem; letter-spacing:.02em;
+  margin:0; font-size:.85rem; font-weight:600; letter-spacing:.02em; white-space:nowrap;
 }
-.annonce-texte strong{ font-weight:600; }
-.annonce-compte{ color:rgba(255,255,255,.82); font-variant-numeric:tabular-nums; }
-.annonce-compte:empty{ display:none; }
+
+/* --- compte à rebours --- */
+.compte-rebours{
+  margin:0; display:flex; align-items:center; gap:.35rem;
+  font-variant-numeric:tabular-nums;
+}
+.cr-bloc{
+  display:inline-flex; align-items:baseline; gap:.15rem;
+  padding:.15rem .45rem; border-radius:3px;
+  background:rgba(0,0,0,.24); border:1px solid rgba(255,255,255,.14);
+}
+.cr-bloc b{
+  font-size:.9rem; font-weight:700; letter-spacing:-.01em;
+  /* Largeur figée : sans cela, chaque changement de chiffre décale les
+     blocs voisins et le bandeau tressaute une fois par seconde. */
+  min-width:2ch; text-align:right;
+}
+.cr-bloc i{ font-style:normal; font-size:.68rem; opacity:.75; }
+
+.annonce-ouvert{ font-size:.85rem; font-weight:600; }
 
 /* Décalage de tout ce qui est fixe ou ancré. */
 body:has(.annonce-haut) .site-header{ top:var(--annonce-h); }
@@ -1574,9 +1589,15 @@ body:has(.annonce-haut) .fil{ padding-top:calc(6.5rem + var(--annonce-h)); }
 body:has(.annonce-haut) .page{ padding-top:calc(9.5rem + var(--annonce-h)); }
 body:has(.annonce-haut) .nav{ top:calc(74px + var(--annonce-h)); }
 
-@media (max-width:620px){
+@media (max-width:760px){
+  .annonce-inner{ flex-wrap:wrap; gap:.5rem .6rem; padding:.5rem 0; }
   .annonce-texte{ font-size:.79rem; }
-  .annonce-inner{ padding:.4rem 0; }
+  .cr-bloc{ padding:.12rem .38rem; }
+  .cr-bloc b{ font-size:.83rem; }
+}
+@media (max-width:420px){
+  /* Sur un écran étroit, les secondes coûtent une ligne pour rien. */
+  .cr-secondes{ display:none; }
 }
 
 /* =========================================================

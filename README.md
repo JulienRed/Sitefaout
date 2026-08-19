@@ -231,8 +231,8 @@ L'offre compte **quatre packs**, décrits une seule fois dans
 |---|---|---|---|
 | Pack Essentiel | disponible | oui | oui |
 | Pack Sur-mesure | disponible | oui | oui |
-| Troisième formule | en préparation | non | non |
-| Quatrième formule | en préparation | non | non |
+| Pack Premium | en préparation | non | non |
+| Pack Prestige | en préparation | non | non |
 
 Cette liste fait autorité. `python3 tools/generer-pages-packs.py` régénère à
 partir d'elle : la section de la page d'accueil (entre les marqueurs
@@ -244,9 +244,9 @@ les options du `<select id="f-pack">` dans `index.html`, la liste `PACKS` de
 `server/devis.js` (qui refuse toute autre valeur), et `SLUGS` dans
 `assets/js/main.js`.
 
-> **À compléter.** Les deux packs en préparation attendent leur nom définitif, et
-> les deux packs disponibles affichent « Sur devis » plutôt qu'un tarif de départ
-> inventé.
+> **À compléter.** Le périmètre et le tarif du Pack Premium et du Pack Prestige
+> restent à définir, et les deux packs disponibles affichent « Sur devis » plutôt
+> qu'un tarif de départ inventé.
 
 ## Bandeau d'annonce
 
@@ -435,8 +435,9 @@ Tout est en CSS/SVG, en cycles lents de 6 à 9 s, en monochrome rouge.
 4. **Billetterie** : les trois événements de `data/billetterie.json`, leurs dates
    et leurs tarifs sont fictifs. Les conditions de vente doivent être relues par
    un juriste.
-5. **Packs** : nommer les deux formules en préparation, et fixer un tarif de
-   départ pour l'Essentiel et le Sur-mesure si vous en voulez un affiché.
+5. **Packs** : définir le périmètre du Pack Premium et du Pack Prestige, et fixer
+   un tarif de départ pour l'Essentiel et le Sur-mesure si vous en voulez un
+   affiché.
 6. **Bandeau d'annonce** : renseigner la vraie date d'ouverture dans
    `CONFIG.OUVERTURE`.
 4. **Réalisations** : les six études de cas et leurs chiffres sont fictifs. Les

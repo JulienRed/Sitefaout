@@ -23,13 +23,21 @@
     verdict.hidden = false;
     if (resultat.valide) {
       verdict.className = 'verdict verdict-ok';
+      /* Les valeurs viennent du serveur, qui ne les renvoie qu'après avoir
+         vérifié la signature et les avoir passées au tamis de [A-Z0-9] : rien
+         d'injectable ne peut arriver jusqu'ici. On les pose quand même en
+         texte plutôt qu'en HTML, pour que la sûreté de cette page ne dépende
+         pas d'une règle écrite dans un autre fichier. */
       verdict.innerHTML = '<p class="verdict-titre">Billet valide</p>' +
         '<dl class="verdict-detail">' +
-        '<dt>Commande</dt><dd>' + resultat.commande + '</dd>' +
-        '<dt>Billet n°</dt><dd>' + resultat.numero + '</dd>' +
-        '<dt>Événement</dt><dd>' + resultat.evenement + '</dd>' +
+        '<dt>Commande</dt><dd data-champ="commande"></dd>' +
+        '<dt>Billet n°</dt><dd data-champ="numero"></dd>' +
+        '<dt>Événement</dt><dd data-champ="evenement"></dd>' +
         '</dl>' +
         '<p class="verdict-note">Notez ce code comme admis : un second passage ne serait pas détecté.</p>';
+      ['commande', 'numero', 'evenement'].forEach(function (champ) {
+        verdict.querySelector('[data-champ="' + champ + '"]').textContent = resultat[champ];
+      });
     } else {
       verdict.className = 'verdict verdict-ko';
       verdict.innerHTML = '<p class="verdict-titre">Billet refusé</p>' +

@@ -47,7 +47,7 @@
 
 *,*::before,*::after{ box-sizing:border-box; }
 
-html{ scroll-behavior:smooth; scroll-padding-top:90px; }
+html{ scroll-behavior:smooth; scroll-padding-top:calc(90px + var(--annonce-h)); }
 
 body{
   margin:0;
@@ -1414,8 +1414,15 @@ p{ margin:0 0 1rem; }
 /* =========================================================
    BILLETTERIE
    ========================================================= */
+/* Le catalogue arrive après coup : sans réservation de place, l'apparition
+   des cartes repousse d'un coup la FAQ qui suit, et ce sursaut est compté
+   comme décalage cumulé (CLS). Le bloc d'attente occupe donc à lui seul la
+   hauteur de l'écran — ce qui vient ensuite reste hors champ pendant le
+   chargement. La réserve disparaît avec le bloc, que la requête aboutisse
+   ou qu'elle échoue. */
 .billetterie-chargement{
-  display:flex; align-items:center; gap:1rem; padding:3rem 0; color:var(--texte-doux);
+  display:flex; align-items:flex-start; gap:1rem; padding:3rem 0;
+  min-height:70vh; color:var(--texte-doux);
 }
 .billetterie-chargement p{ margin:0; }
 .spinner{
@@ -1542,15 +1549,26 @@ p{ margin:0 0 1rem; }
    ========================================================= */
 :root{ --annonce-h:0px; }
 
+/* Hauteur du bandeau imposée par la feuille de style, pas subie.
+   Tant qu'elle dépendait du texte, elle changeait avec le nombre de
+   chiffres du décompte et la largeur de l'écran : la page s'affichait
+   à une hauteur puis se recalait dès que le script mesurait — un saut
+   visible, compté comme décalage cumulé (CLS). En la fixant ici, la
+   valeur est juste dès la première image et le script n'a plus rien
+   à mesurer. */
+html.avec-annonce{ --annonce-h:47px; }
+@media (max-width:760px){ html.avec-annonce{ --annonce-h:45px; } }
+
 .annonce-haut{
   position:fixed; inset:0 0 auto 0; z-index:120;
+  height:var(--annonce-h); box-sizing:border-box; overflow:hidden;
   background:linear-gradient(90deg,var(--rouge-sombre),var(--rouge) 45%,var(--rouge-sombre));
   color:#fff;
   border-bottom:1px solid rgba(0,0,0,.25);
 }
 .annonce-inner{
   display:flex; align-items:center; justify-content:center; gap:.75rem;
-  min-height:40px; padding:.45rem 0;
+  height:100%;
 }
 .annonce-pastille{
   width:7px; height:7px; border-radius:50%; background:#fff; flex:none;
@@ -1580,24 +1598,47 @@ p{ margin:0 0 1rem; }
 
 .annonce-ouvert{ font-size:.85rem; font-weight:600; }
 
-/* Décalage de tout ce qui est fixe ou ancré. */
-body:has(.annonce-haut) .site-header{ top:var(--annonce-h); }
-body:has(.annonce-haut){ scroll-padding-top:calc(90px + var(--annonce-h)); }
-html:has(.annonce-haut){ scroll-padding-top:calc(90px + var(--annonce-h)); }
-body:has(.annonce-haut) .hero{ padding-top:calc(11rem + var(--annonce-h)); }
-body:has(.annonce-haut) .fil{ padding-top:calc(6.5rem + var(--annonce-h)); }
-body:has(.annonce-haut) .page{ padding-top:calc(9.5rem + var(--annonce-h)); }
-body:has(.annonce-haut) .nav{ top:calc(74px + var(--annonce-h)); }
+/* Décalage de tout ce qui est fixe ou ancré.
+   La condition passe par une classe posée dans le HTML, pas par :has().
+   Sept règles `body:has(…)` obligeaient le navigateur à réévaluer tout
+   l'arbre au moindre changement sur la racine — et --annonce-h, écrite
+   précisément sur la racine, déclenchait cette réévaluation à chaque
+   mesure. C'était l'essentiel du temps de blocage au chargement. */
+.avec-annonce .site-header{ top:var(--annonce-h); }
+.avec-annonce .hero{ padding-top:calc(11rem + var(--annonce-h)); }
+.avec-annonce .fil{ padding-top:calc(6.5rem + var(--annonce-h)); }
+.avec-annonce .page{ padding-top:calc(9.5rem + var(--annonce-h)); }
+.avec-annonce .nav{ top:calc(74px + var(--annonce-h)); }
 
+/* Le bandeau tient sur une seule ligne à toutes les largeurs : c'est ce qui
+   rend sa hauteur prévisible. On rétrécit donc le contenu au lieu de le
+   laisser se replier. */
 @media (max-width:760px){
-  .annonce-inner{ flex-wrap:wrap; gap:.5rem .6rem; padding:.5rem 0; }
+  .annonce-inner{ gap:.5rem; }
   .annonce-texte{ font-size:.79rem; }
   .cr-bloc{ padding:.12rem .38rem; }
   .cr-bloc b{ font-size:.83rem; }
 }
-@media (max-width:420px){
-  /* Sur un écran étroit, les secondes coûtent une ligne pour rien. */
+@media (max-width:520px){
+  /* Sur un écran étroit, les secondes prennent une place qu'elles ne
+     méritent pas : le décompte reste lisible sans elles. */
   .cr-secondes{ display:none; }
+}
+@media (max-width:400px){
+  .annonce-inner{ gap:.4rem; }
+  .annonce-texte{ font-size:.72rem; }
+  .cr-bloc{ padding:.1rem .3rem; gap:.1rem; }
+  .cr-bloc b{ font-size:.76rem; }
+  .cr-bloc i{ font-size:.62rem; }
+}
+@media (max-width:360px){
+  /* Les plus petits écrans du marché : on resserre encore plutôt que de
+     laisser le texte déborder du bandeau. */
+  .annonce-inner{ gap:.3rem; }
+  .annonce-pastille{ display:none; }
+  .annonce-texte{ font-size:.68rem; }
+  .cr-bloc{ padding:.08rem .26rem; }
+  .cr-bloc b{ font-size:.72rem; }
 }
 
 /* =========================================================

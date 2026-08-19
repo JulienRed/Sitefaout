@@ -87,16 +87,12 @@
     var barre = $('#annonceHaut');
     if (!barre) return;
 
-    /* La hauteur du bandeau est publiée en variable CSS : l'en-tête fixe et
-       les ancres internes s'en servent pour se décaler. Elle change quand le
-       texte se replie, d'où l'observation continue. */
-    function mesurer() {
-      document.documentElement.style.setProperty(
-        '--annonce-h', barre.offsetHeight + 'px');
-    }
-    mesurer();
-    window.addEventListener('resize', mesurer);
-    if (window.ResizeObserver) new ResizeObserver(mesurer).observe(barre);
+    /* Aucune mesure ici : la hauteur du bandeau est fixée dans la feuille
+       de style (--annonce-h) et le contenu s'y adapte. Le script mesurait
+       auparavant offsetHeight puis réécrivait la variable sur la racine,
+       ce qui invalidait le style de tout le document ; le ResizeObserver,
+       réveillé par les décalages que cette écriture provoquait, relançait
+       le cycle. C'était l'essentiel du temps de blocage au chargement. */
 
     var bloc = $('#compteRebours');
     if (!bloc) return;
@@ -132,7 +128,6 @@
       if (libelle) libelle.textContent = 'L’entreprise est ouverte';
       barre.classList.add('annonce-ouvert');
       if (texte) texte.textContent = '';
-      mesurer();
     }
 
     function battre() {
@@ -173,7 +168,6 @@
     });
 
     demarrer();
-    mesurer();
   }());
 
   /* =========================================================

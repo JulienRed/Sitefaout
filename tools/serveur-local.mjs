@@ -40,6 +40,21 @@ const BOITE = join(RACINE, '.local', 'emails');
 const SIMULE_STRIPE = !process.env.STRIPE_SECRET_KEY;
 const SIMULE_EMAIL = !process.env.RESEND_API_KEY;
 
+/* Ce serveur émet de vrais billets signés au bout d'un paiement qui n'a jamais
+   eu lieu. C'est exactement ce qu'on veut pour essayer la billetterie sur son
+   poste, et exactement ce qu'on ne veut nulle part ailleurs. Netlify et Vercel
+   ne le lancent pas — ils servent les fichiers statiques et les fonctions de
+   `api/` — mais `npm start` pointe ici, et une plateforme qui exécuterait cette
+   commande sans clé Stripe ouvrirait une billetterie gratuite. D'où ce refus. */
+if (SIMULE_STRIPE && process.env.NODE_ENV === 'production') {
+  console.error(
+    '\nRefus de démarrer : NODE_ENV=production sans STRIPE_SECRET_KEY.\n' +
+    'tools/serveur-local.mjs simule alors les paiements et émettrait des\n' +
+    'billets valides sans encaissement. Servez le site en statique et\n' +
+    'déployez les fonctions de api/ ou netlify/functions/.\n');
+  process.exit(1);
+}
+
 process.env.BILLET_SECRET = process.env.BILLET_SECRET ||
   'developpement-local-cle-de-signature-non-secrete';
 

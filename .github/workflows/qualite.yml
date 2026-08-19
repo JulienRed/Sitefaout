@@ -14,11 +14,11 @@ jobs:
     name: Audit accessibilité, responsive et liens
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Installer Playwright
         run: npm install --no-save playwright@1.56.1 && npx playwright install --with-deps chromium
@@ -35,11 +35,15 @@ jobs:
           MOTIFS="$MOTIFS"'|sk_(test|live)_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,}'
           MOTIFS="$MOTIFS"'|pk_(test|live)_[A-Za-z0-9]{20,})'
           if grep -rIn -E "$MOTIFS" \
-               --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.claude . ; then
+               --exclude-dir=.git --exclude-dir=node_modules \
+               --exclude-dir=.claude --exclude-dir=.local . ; then
             echo "::error::Une clé secrète semble présente dans le dépôt."
             exit 1
           fi
           echo "Aucun secret détecté."
+
+      - name: Vérifier les dépendances
+        run: npm audit --audit-level=high
 
       - name: Banc d'essai de la billetterie
         run: node tools/tester-billetterie.mjs
@@ -62,24 +66,44 @@ jobs:
     name: Budget de performance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
+      # Sans compression : les poids relevés ici sont donc les poids bruts,
+      # alors qu'en production Netlify et Vercel servent tout en gzip
+      # (environ un tiers). Le budget de .github/budget-lighthouse.json est
+      # calé sur ces poids bruts, il est donc volontairement sévère.
       - name: Servir le site
         run: npx --yes http-server -p 8080 -s . &
 
       - name: Attendre le serveur
         run: npx --yes wait-on http://127.0.0.1:8080 --timeout 30000
 
+      # Les pages de packs sont générées : elles apparaissent et disparaissent
+      # avec l'offre. Une liste écrite en dur ici finit par pointer une page
+      # supprimée — Lighthouse renvoie alors une erreur 404 qui masque le vrai
+      # résultat des autres pages. On lit donc les pages réellement présentes.
+      - name: Établir la liste des pages à mesurer
+        id: pages
+        run: |
+          {
+            echo 'urls<<FIN'
+            echo 'http://127.0.0.1:8080/index.html'
+            echo 'http://127.0.0.1:8080/billetterie.html'
+            for f in packs/*.html; do
+              [ -e "$f" ] || continue
+              echo "http://127.0.0.1:8080/$f"
+            done
+            echo 'FIN'
+          } >> "$GITHUB_OUTPUT"
+
       - name: Lighthouse
         uses: treosh/lighthouse-ci-action@v12
         with:
-          urls: |
-            http://127.0.0.1:8080/index.html
-            http://127.0.0.1:8080/packs/convention.html
+          urls: ${{ steps.pages.outputs.urls }}
           budgetPath: ./.github/budget-lighthouse.json
           uploadArtifacts: true
           temporaryPublicStorage: true

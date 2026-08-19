@@ -237,8 +237,18 @@ async function creerPaiement(donnees, contexte) {
     console.error('Contrôle de quota impossible :', err.message);
   }
 
-  var base = (process.env.SITE_URL || '').replace(/\/+$/, '') ||
-             (contexte && contexte.origine) || '';
+  /* Les URL de retour disent au navigateur de l'acheteur où revenir après
+     le paiement. Les déduire de l'en-tête Host laisserait quiconque sait
+     forger cet en-tête faire revenir l'acheteur sur son propre domaine,
+     à l'instant précis où il s'attend à voir sa commande confirmée.
+     SITE_URL, écrite dans la configuration du déploiement, n'a pas ce
+     défaut ; l'en-tête ne sert que de secours en développement. */
+  var base = (process.env.SITE_URL || '').replace(/\/+$/, '');
+  if (!base) {
+    console.warn('SITE_URL absente : les URL de retour Stripe sont déduites ' +
+                 'de l’en-tête Host, ce qui n’est pas sûr en production.');
+    base = (contexte && contexte.origine) || '';
+  }
 
   try {
     var session = await stripe('checkout/sessions', 'POST', {

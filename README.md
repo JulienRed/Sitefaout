@@ -449,28 +449,91 @@ Analytics imposerait l'un et la réécriture de l'autre.
 
 ## Performance et sobriété
 
+Relevés Lighthouse (mobile, réseau et processeur bridés), sur les pages
+mesurées par l'intégration continue :
+
+| Page | Score | LCP | TBT | CLS |
+|------|-------|-----|-----|-----|
+| `index.html` | 99 | 2,0 s | 70 ms | 0 |
+| `packs/essentiel.html` | 99 | 2,0 s | 20 ms | 0 |
+| `packs/sur-mesure.html` | 99 | 2,0 s | 0 ms | 0 |
+| `billetterie.html` | 99 | 2,0 s | 0 ms | 0 |
+
 - **Inter auto-hébergé** en un seul fichier variable de 48 Ko : aucune requête
   vers Google Fonts, donc aucune adresse IP transmise à un tiers — un point
   regardé de près côté RGPD.
 - **Animations mises en pause hors de l'écran** (`IntersectionObserver`) et
-  quand l'onglet passe en arrière-plan : les six vignettes de packs ne
-  consomment plus de CPU quand personne ne les regarde.
+  quand l'onglet passe en arrière-plan : les vignettes de packs ne consomment
+  plus de CPU quand personne ne les regarde.
+- **Hauteur du bandeau d'annonce fixée dans la feuille de style.** Elle était
+  auparavant mesurée en JavaScript puis réécrite dans une variable CSS sur la
+  racine, ce qui invalidait le style de tout le document ; sept règles `:has()`
+  posées sur `html`/`body` rendaient chaque recalcul très coûteux, et un
+  `ResizeObserver` relançait le cycle. À elles deux, ces lignes représentaient
+  l'essentiel du temps de blocage : 340 ms de TBT et un indice de vitesse de
+  3,9 s, contre 70 ms et 1,2 s aujourd'hui.
+- **Place réservée au catalogue de la billetterie** pendant son chargement :
+  sans cela, l'arrivée des cartes repoussait la FAQ d'un coup (CLS 0,074).
 - En-têtes de cache et de sécurité fournis pour les deux plateformes.
-- Pas encore d'images en dehors du logo : quand vous en ajouterez, prévoyez
-  AVIF/WebP, `loading="lazy"` et des dimensions explicites.
 
-## Les six packs et leurs animations
+Le budget de `.github/budget-lighthouse.json` est calé sur des poids **non
+compressés** — c'est ce que sert `http-server` en intégration continue, alors
+que Netlify et Vercel servent tout en gzip. Il est donc volontairement sévère.
+
+## Animations des packs
 
 | Pack | Animation |
 |------|-----------|
-| Séminaire | plan de salle en perspective balayé par une lumière de scène |
-| Convention | audience en perspective + arc de scène qui se dessine |
-| Lancement produit | ondes concentriques depuis l'objet mis en lumière |
-| Soirée de gala | colonnade, table ronde et balayage lumineux lent |
-| Team building | réseau de nœuds qui se connectent progressivement |
+| Essentiel | plan de salle en perspective balayé par une lumière de scène |
 | Sur-mesure | rubis à facettes avec point en orbite |
+| Premium | motif d'attente, sablier lent |
+| Prestige | horizon qui se dessine, scène « à venir » |
 
 Tout est en CSS/SVG, en cycles lents de 6 à 9 s, en monochrome rouge.
+
+## Sécurité
+
+Ce qui est en place :
+
+- **Aucun secret dans le dépôt.** Toutes les clés passent par des variables
+  d'environnement (`.env.example` en donne la liste, sans valeurs). L'intégration
+  continue échoue si un motif de clé Resend, Stripe ou 21st apparaît dans le code.
+- **Dépendances figées** par `package-lock.json` (`npm audit` : 0 vulnérabilité).
+- **En-têtes** sur les deux plateformes : CSP stricte sans `unsafe-inline`,
+  HSTS deux ans avec sous-domaines, `nosniff`, `X-Frame-Options`,
+  `Referrer-Policy`, `Permissions-Policy`. `third-party` est budgété à 0 octet.
+- **Devis** : anti-robot Turnstile, pot de miel, limite de débit, pièces jointes
+  filtrées par extension et par taille, en-têtes d'e-mail nettoyés de tout
+  retour chariot. L'accusé de réception n'est envoyé **que** si Turnstile
+  confirme un humain — sans cette condition, le formulaire servait de relais à
+  courrier indésirable, expédié depuis un domaine vérifié.
+- **Paiement** : les prix sont recalculés côté serveur à partir de
+  `data/billetterie.json`, jamais lus dans la requête. Les quantités sont
+  validées en entier strict. Le navigateur ne prouve aucun paiement : les
+  billets ne sont émis que par le webhook, dont la signature est vérifiée
+  (HMAC-SHA256, tolérance de 5 minutes) avant toute action.
+- **Billets** signés en HMAC-SHA256 et comparés en temps constant
+  (`crypto.timingSafeEqual`).
+- **URL de retour Stripe** issues de `SITE_URL`. L'en-tête `Host`, que
+  n'importe qui peut forger, ne sert que de secours en développement et le
+  serveur le signale dans ses journaux.
+
+Limites assumées, à connaître avant d'ouvrir la billetterie au public :
+
+- **La limite de débit est en mémoire.** Sur des fonctions serverless, chaque
+  instance a la sienne : elle freine un robot isolé, pas une attaque répartie.
+  Un magasin partagé (Upstash, Redis) serait nécessaire pour cela.
+- **Un billet valide n'est pas un billet non utilisé.** La signature prouve
+  l'authenticité, pas l'unicité du passage ; détecter un second scan demande un
+  état partagé.
+- **Le webhook n'est pas dédupliqué**, mais il est idempotent : la référence de
+  commande dérive de l'identifiant de session, donc un événement rejoué réémet
+  les mêmes codes et renvoie le même e-mail — il ne crée pas de billets
+  supplémentaires.
+- **`tools/serveur-local.mjs` contient un écran de paiement simulé.** Ce fichier
+  est un outil de développement, il n'est jamais déployé : ni `netlify.toml` ni
+  `vercel.json` n'y font référence, et rien dans `api/` ou `netlify/functions/`
+  ne l'importe.
 
 ## À personnaliser avant mise en ligne
 
@@ -487,9 +550,10 @@ Tout est en CSS/SVG, en cycles lents de 6 à 9 s, en monochrome rouge.
    affiché.
 6. **Bandeau d'annonce** : remplacer la date provisoire `2028-09-01T09:00` par
    la vraie date d'ouverture dans `CONFIG.OUVERTURE`.
-4. **Réalisations** : les six études de cas et leurs chiffres sont fictifs. Les
+7. **Réalisations** : les six études de cas et leurs chiffres sont fictifs. Les
    scènes SVG peuvent rester telles quelles, ou céder la place à vos photos
    (prévoir AVIF/WebP, `loading="lazy"` et dimensions explicites).
-5. Chiffres clés du hero, tarifs de départ des packs, contenu de la FAQ.
-6. Nom de l'agence, adresse, téléphone, e-mail (`index.html`, pages annexes et
-   `CONFIG.CONTACT_EMAIL` dans `assets/js/main.js`).
+8. Chiffres clés du hero, tarifs de départ des packs, contenu de la FAQ.
+9. Adresse, téléphone, e-mail (`index.html`, pages annexes et
+   `CONFIG.CONTACT_EMAIL` dans `assets/js/main.js`), et le domaine
+   `edb-evenement.fr` employé dans les URL canoniques et `SITE_URL`.

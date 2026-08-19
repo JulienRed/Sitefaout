@@ -81,7 +81,7 @@
 
     var categories = ev.categories.map(function (c) {
       return '' +
-        '<div class="categorie" data-categorie="' + c.id + '">' +
+        '<div class="categorie" data-categorie="' + echapper(c.id) + '">' +
           '<div class="categorie-info">' +
             '<p class="categorie-nom">' + echapper(c.nom) + '</p>' +
             (c.description ? '<p class="categorie-desc">' + echapper(c.description) + '</p>' : '') +
@@ -91,7 +91,7 @@
             '<button type="button" class="js-moins" aria-label="Retirer un billet ' +
               echapper(c.nom) + '"' + (indisponible ? ' disabled' : '') + '>−</button>' +
             '<output class="compteur-valeur" aria-live="off">0</output>' +
-            '<button type="button" class="js-plus" data-max="' + c.max_par_commande +
+            '<button type="button" class="js-plus" data-max="' + echapper(c.max_par_commande) +
               '" aria-label="Ajouter un billet ' + echapper(c.nom) + '"' +
               (indisponible ? ' disabled' : '') + '>+</button>' +
           '</div>' +
